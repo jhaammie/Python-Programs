@@ -1,0 +1,154 @@
+
+
+# Brave API
+
+"""
+
+Making a search-engine like thing using brave API
+Web search
+Image search
+Video search
+News search
+
+"""
+
+# importing what I need
+import requests
+import json
+
+
+UseOptions = input("Would you like to do a web(w), image(i), video(v), or news(n) search? ")
+lower = UseOptions.lower()
+
+if lower == 'w':
+    # WEB SEARCH
+
+    # Defining a function for web search
+    def WebSearch(options, request):
+
+        # My headers
+        headers = {
+            'X-Subscription-Token': 'BSAAQhjtyJK48R1VSFGVmZi2ndJ5rE0'
+        }
+
+        # Requesting
+        req = requests.get(f"https://api.search.brave.com/res/v1/web/search?q={request}", headers=headers)
+        data = json.loads(req.text)
+
+        # if the user wants to do a web search
+        if options == 1:
+            # Getting the top 2 results (0 and 1)
+            for i in range(0, 2):
+
+                # Parsing the data
+                parsing = data["web"]["results"][i]["url"]
+                print(parsing)
+
+                parsing2 = data["web"]["results"][i]["description"]
+                print(parsing2)
+                print('\n')
+        # or if the user wants to do a image/video search
+        elif options == 2:
+
+            # Getting the top two results
+            for i in range(0, 2):
+
+                # Parsing
+                parsing = data["videos"]["results"][i]["url"]
+                print(parsing)
+                parsing1 = data["videos"]["results"][i]["thumbnail"]["src"]
+                print(parsing1)
+                print('\n')
+
+
+    # Asking the user if they would like to do a web search or a video/image search
+    options = int(input("Would you like to do a web search (enter 1) or get a video/image search (enter 2)? "))
+
+    # Asking the user for their search query
+    request = input("Please enter your query: ")
+
+    # Calling my function
+    WebSearch(options, request)
+
+
+elif lower == "i":
+
+    # IMAGE SEARCH
+
+
+    def ImageSearch(query):
+
+        # My headers
+        headers = {
+            'X-Subscription-Token': 'BSAAQhjtyJK48R1VSFGVmZi2ndJ5rE0'
+        }
+
+        # Requesting
+        req = requests.get(f"https://api.search.brave.com/res/v1/images/search?q={query}", headers=headers)
+        print(req.text)
+        print(req)
+        data = json.loads(req.text)
+        for i in range(0, 10):
+            parsing = data["results"][i]["url"]
+            print("Result: ", i + 1)
+            print(parsing)
+            print("\n")
+
+
+    request = input("Please enter your query: ")
+    ImageSearch(request)
+
+elif lower == "v":
+
+    # VIDEO SEARCH
+
+    def VideoSearch(query):
+        # My headers
+        headers = {
+            'X-Subscription-Token': 'BSAAQhjtyJK48R1VSFGVmZi2ndJ5rE0'
+        }
+
+        # Requesting
+        req = requests.get(f"https://api.search.brave.com/res/v1/videos/search?q={query}", headers=headers)
+        print(req.text)
+        print(req)
+        data = json.loads(req.text)
+        for i in range(0, 10):
+            parsing = data["results"][i]["url"]
+            print("Result: ", i + 1)
+            print(parsing)
+            print("\n")
+
+
+    request = input("Please enter your query: ")
+    VideoSearch(request)
+
+
+elif lower == "n":
+    # NEWS SEARCH
+
+    def NewsSearch(query):
+
+        # My headers
+        headers = {
+            'X-Subscription-Token': 'BSAAQhjtyJK48R1VSFGVmZi2ndJ5rE0'
+        }
+
+        # Requesting
+        req = requests.get(f"https://api.search.brave.com/res/v1/news/search?q={query}", headers=headers)
+        print(req.text)
+        print(req)
+        data = json.loads(req.text)
+        for i in range(0, 10):
+            parsing = data["results"][i]["url"]
+            print("Result: ", i + 1)
+            print(parsing)
+            print("\n")
+
+
+    request = input("Please enter your query: ")
+    NewsSearch(request)
+
+else:
+    print("Invalid request, please try again")
+    quit()
