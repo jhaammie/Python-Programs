@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Results</title>
+  </head>
+  <body>
+    <h1>Search Results</h1>
+    {% if data.results %}
+      {% for result in data.results %}
+        <div>
+          <img src="{{ result.imageUrl }}" alt="{{ result.displayName }}" width="300">
+          <p>{{ result.displayName }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No results found.</p>
+    {% endif %}
+  </body>
+</html>

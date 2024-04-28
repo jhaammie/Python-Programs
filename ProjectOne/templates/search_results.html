@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Results</title>
+  </head>
+  <body>
+    <h1>Search Results</h1>
+    {% if results %}
+      {% for result in results %}
+        <div>
+          <a href="{{ result.url }}" target="_blank">
+          <p>{{ result.title }}</p>
+          </a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No results found.</p>
+    {% endif %}
+    <a href="/">Search Again</a>
+  </body>
+</html>
