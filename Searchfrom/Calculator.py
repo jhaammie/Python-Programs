@@ -2,7 +2,7 @@
 
 # Simple flask application
 # Importing what I need
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 # Defining app
 app = Flask(__name__)  # Creates an instance of app
@@ -13,7 +13,8 @@ app = Flask(__name__)  # Creates an instance of app
 # Defining a function 'options'
 def options():
     # Returning a list of things you can do
-    return ("You can take the following paths: "
+
+    return ("<h1>You can take the following paths:</h1>"
             "<br/>"
             "/hello?(name=your name) "
             "<br/>"
@@ -25,8 +26,9 @@ def options():
             "<br/>"
             "/div?(n1=...&n2=...) ")
 
-
 # Defining the path and the method
+
+
 @app.route('/hello', methods=["GET"])
 # Defining the function 'hello'
 def hello():
