@@ -18,14 +18,28 @@
     function addition(){
     var inputValue1 = document.getElementById("firstNumber").valueAsNumber
     var inputValue2 = document.getElementById("secondNumber").valueAsNumber;
-    fetch('http://127.0.0.1:5000/add?n1='+inputValue1+'&n2='+inputValue2)
-.then(response => {
-if (response.ok) {
-    document.getElementById("sum").innerHTML=response.json()
-} else {
-document.getElementById("sum").innerHTML='request failed'
-}
-})
+
+    fetch('http://127.0.0.1:5000/add?n1='+inputValue1+'&n2='+inputValue2,{method: "GET"})
+    .then(response => {
+    if (response.ok) {
+        return response.text()
+
+    }  else {
+
+    throw new Error(response.statusText)
+    }
+    })
+  .then(data => {
+    document.getElementById("sum").innerHTML=data
+    // Process the response data here
+    console.log(data); // Example: Logging the data to the console
+  })
+  .catch(error => {
+    document.getElementById("sum").innerHTML=error
+    // Handle any errors here
+    console.error(error); // Example: Logging the error to the console
+  });
+
 
    }
    function subtraction(){

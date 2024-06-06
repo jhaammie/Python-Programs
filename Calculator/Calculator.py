@@ -2,10 +2,11 @@
 
 # Simple flask application
 # Importing what I need
-from flask import Flask, request, render_template
-
+from flask import Flask, request
+from flask_cors import CORS, cross_origin
 # Defining app
 app = Flask(__name__)  # Creates an instance of app
+CORS(app)
 
 
 # Defining the path and method
