@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+</head>
+<style>
+
+    button:hover
+     {
+      background: green;
+    }
+</style>
+<h1>Calculator</h1>
+<script>
+
+    function addition(){
+    var inputValue1 = document.getElementById("firstNumber").valueAsNumber
+    var inputValue2 = document.getElementById("secondNumber").valueAsNumber;
+    fetch('http://127.0.0.1:5000/add?n1='+inputValue1+'&n2='+inputValue2)
+.then(response => {
+if (response.ok) {
+    document.getElementById("sum").innerHTML=response.json()
+} else {
+document.getElementById("sum").innerHTML='request failed'
+}
+})
+
+   }
+   function subtraction(){
+    var inputValue1 = document.getElementById("firstNumber").valueAsNumber
+    var inputValue2 = document.getElementById("secondNumber").valueAsNumber;
+    var difference = inputValue1 - inputValue2
+    document.getElementById("difference").innerHTML=difference
+   }
+   function multiplication(){
+    var inputValue1 = document.getElementById("firstNumber").valueAsNumber
+    var inputValue2 = document.getElementById("secondNumber").valueAsNumber;
+    var product = inputValue1 * inputValue2
+    document.getElementById("product").innerHTML=product
+   }
+   function division(){
+    var inputValue1 = document.getElementById("firstNumber").valueAsNumber
+    var inputValue2 = document.getElementById("secondNumber").valueAsNumber;
+    var quotient = inputValue1 / inputValue2
+    document.getElementById("quotient").innerHTML=quotient
+   }
+
+</script>
+<body style="background-color:skyblue;">
+<label>First Number: </label>
+<input type="number" id="firstNumber">
+<label> Second Number: </label>
+<input type="number" id="secondNumber">
+<button onclick="addition()">Add</button>
+<button onclick="subtraction()">Subtract</button>
+<button onclick="multiplication()">Multiply</button>
+<button onclick="division()">Divide</button>
+<p id="sum"></p>
+<p id="difference"></p>
+<p id="product"></p>
+<p id="quotient"></p>
+
+</body>
+</html>
