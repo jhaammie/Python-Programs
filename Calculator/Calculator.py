@@ -3,7 +3,7 @@
 # Simple flask application
 # Importing what I need
 from flask import Flask, request
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 # Defining app
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)
@@ -61,7 +61,6 @@ def add():
 
         # Adding the numbers and returning the sum
         SumOfIntegers = int(n1) + int(n2)
-
         return str(SumOfIntegers)
 
     # Otherwise returning an error
