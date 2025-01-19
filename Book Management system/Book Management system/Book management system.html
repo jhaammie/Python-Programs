@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BMS</title>
+
+</head>
+<style>
+  button:hover {
+    background: rgb(173, 216, 230);
+  }
+</style>
+<h1>Book Management</h1>
+
+<script>
+
+  function DisplayBooks() {
+    fetch("http://127.0.0.1:5000/books", {
+      method: "GET", headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+      .then(response => {
+        if (response.ok) {
+          return response.text()
+        } else {
+          return Promise.reject(response.text())
+        }
+      })
+      .then(data => {
+        var booksjson = JSON.parse(data)
+        var displayString = "<br/>"
+        if (booksjson.length == 0) {
+          displayString += "No books present"
+        }
+        else {
+          for (let i = 0; i < booksjson.length; i++) {
+            let obj = booksjson[i];
+            displayString = displayString + "Title: " + obj["Title"] + ", Author: " + obj["Author"] + "<br/> <br/>"
+          }
+
+        }
+
+        document.getElementById("ListOfBooks").innerHTML = displayString
+        // Process the response data here
+        console.log(data); // Example: Logging the data to the console
+
+      })
+      .catch(error => {
+        error.then(error_message => {
+          document.getElementById("StatusOfaddBook").innerHTML = "<p style='Color:Red'>" + error_message + "</p>"
+        })
+      });
+  }
+
+  function addBook() {
+    const title = document.getElementById("BookName").value
+    const author = document.getElementById("author").value;
+
+    const promise = fetch("http://127.0.0.1:5000/books/add", {
+      method: "POST", headers: {
+        'Content-Type': 'application/json'
+      },
+
+      // Adding body or contents to send
+      body: JSON.stringify({
+        title: title,
+        author: author,
+      })
+    });
+
+
+    promise.then(response => {
+      if (response.ok) {
+        return response.text()
+      } else {
+        return Promise.reject(response.text())
+      }
+    })
+      .then(data => {
+        document.getElementById("StatusOfaddBook").innerHTML = "<p style='Color:Green'>" + data + "</p>"
+        // Process the response data here
+      })
+      .catch(error => {
+        error.then(error_message => {
+          document.getElementById("StatusOfaddBook").innerHTML = "<p style='Color:Red'>" + error_message + "</p>"
+        })
+      });
+  }
+  function SortBooks(sortby) {
+    console.log(sortby)
+    fetch("http://127.0.0.1:5000/books/sort?by=" + sortby, {
+      method: "GET", headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+      .then(response => {
+        if (response.ok) {
+          return response.text()
+        } else {
+          console.log(response)
+          throw new Error(response.body)
+        }
+      })
+      .then(data => {
+        var booksjson = JSON.parse(data)
+        var displayString = "<br/>"
+        if (booksjson.length == 0) {
+          displayString += "No books present"
+        }
+        else {
+          for (let i = 0; i < booksjson.length; i++) {
+            let obj = booksjson[i];
+            displayString = displayString + "Title: " + obj["Title"] + ", Author: " + obj["Author"] + "<br/> <br/>"
+          }
+
+        }
+
+        document.getElementById("ListOfBooks").innerHTML = displayString
+        // Process the response data here
+        console.log(data); // Example: Logging the data to the console
+
+      })
+      .catch(error => {
+        document.getElementById("StatusOfaddBook").innerHTML = "<p style='Color:Red'>" + error + "</p>"
+        // Handle any errors here
+        console.error(error); // Example: Logging the error to the console
+      });
+  }
+
+
+</script>
+
+<body style="background-color:rgb(239, 230, 250);">
+  <label>Book Name: </label><input type="text" id="BookName">
+  <label> Author: </label>
+  <input type="text" id="author">
+  <br />
+  &nbsp
+  <div>
+
+
+    <div id="StatusOfaddBook"></div>
+    <button type="button" onclick="addBook()">Submit</button>
+    <button type="button" onclick="DisplayBooks()">View Books</button>
+    <button type="button" onclick="SortBooks('title')">Sort By Title</button>
+    <button type="button" onclick="SortBooks('author')">Sort By Author</button>
+    <div id="ListOfBooks"></div>
+
+  </div>
+
+</body>
+
+</html>

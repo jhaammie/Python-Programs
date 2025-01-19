@@ -103,6 +103,7 @@ elif lower == "i":
         # print(req.text)
         print(req)
         data = json.loads(req.text)
+        print(data)
         if data and 'results' in data:
             ValuesToRead = 30
             if len(data["results"]) < 30:

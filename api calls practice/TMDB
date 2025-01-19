@@ -1,0 +1,175 @@
+
+# Finish Program
+
+"""
+
+Finished Program
+
+"""
+
+import json
+import requests
+
+
+# Creating class
+
+
+class TMDBclient:
+
+
+    def GetGuestSessionID(self):
+        # Creating the guest session ID
+        url = "https://api.themoviedb.org/3/authentication/guest_session/new"
+
+        # Creating headers
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json;charset=utf-8",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODNkODg5ZTIzMmFhYzg3MmNlY2MwZTViYmFjOTVmMyIsInN1YiI6IjY0NDk4MTk3NmEyMjI3MDRmOGQxOWY0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZR1gFwMrYKFPrj1-duSnTCRlzCy4Ssar9wJTYytlzwM"
+        }
+
+        # Getting the guest session ID
+        request = requests.get(url, headers=headers)
+        return request
+
+    def AddRatingtoMovie(self):
+        # Adding the rating to a specific movie/tv series
+        r = tmdb_client.GetGuestSessionID()  # Call the method to get the guest session ID
+        d = tmdb_client.GetMovieDetailsBasedOnName()
+        u = f"https://api.themoviedb.org/3/movie/{d}/rating?guest_session_id={r}"
+        print(u)
+
+        # The payload is basically the number rating I give it
+        payload = "{\"value\":7.0}"
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json;charset=utf-8",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODNkODg5ZTIzMmFhYzg3MmNlY2MwZTViYmFjOTVmMyIsInN1YiI6IjY0NDk4MTk3NmEyMjI3MDRmOGQxOWY0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZR1gFwMrYKFPrj1-duSnTCRlzCy4Ssar9wJTYytlzwM"
+        }
+
+        # Posting the data
+        req = requests.post(u, data=payload, headers=headers)
+
+        print(req.text)
+
+        # Getting movie ID based on name
+    def GetMovieDetailsBasedOnName(self):
+        name = input("Please enter the name of the movie: ")
+        url3 = f'https://api.themoviedb.org/3/search/movie?query={name}&api_key=583d889e232aac872cecc0e5bbac95f3'
+        # Because I put the api key in the url above I don't need headers which is why this is all I need to do to get the data
+        g = requests.get(url3)
+        print("Movie details based on name")
+
+        return g
+
+        # Getting list of rated movies
+    def GettingListOfRatedMovies(self):
+        url2 = f"https://api.themoviedb.org/3/account/19163668/rated/movies?language=en-US&page=1&sort_by=created_at.asc"
+
+
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json;charset=utf-8",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODNkODg5ZTIzMmFhYzg3MmNlY2MwZTViYmFjOTVmMyIsInN1YiI6IjY0NDk4MTk3NmEyMjI3MDRmOGQxOWY0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZR1gFwMrYKFPrj1-duSnTCRlzCy4Ssar9wJTYytlzwM"
+        }
+
+        # Getting the data
+        request2 = requests.get(url2, headers=headers)
+        print('r2', request2.text)
+        print(request2.status_code)
+
+
+        return results
+    # Deleting the rating I added earlier
+
+    def DeleteMovieRating(self):
+
+
+        u2 = f"https://api.themoviedb.org/3/movie/{d}/rating"
+        headers = {
+            "accept": "application/json",
+            "Content-Type": "application/json;charset=utf-8",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODNkODg5ZTIzMmFhYzg3MmNlY2MwZTViYmFjOTVmMyIsInN1YiI6IjY0NDk4MTk3NmEyMjI3MDRmOGQxOWY0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZR1gFwMrYKFPrj1-duSnTCRlzCy4Ssar9wJTYytlzwM"
+        }
+        # Deleting the rating
+        req2 = requests.delete(u2, headers=headers)
+
+        print(req2.text)
+        print(req2.status_code)
+
+# Deleting all the ratings in one go
+    def DeleteAllRatings(self, id):
+
+            u2 = f"https://api.themoviedb.org/3/movie/{id}/rating"
+            headers = {
+                "accept": "application/json",
+                "Content-Type": "application/json;charset=utf-8",
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODNkODg5ZTIzMmFhYzg3MmNlY2MwZTViYmFjOTVmMyIsInN1YiI6IjY0NDk4MTk3NmEyMjI3MDRmOGQxOWY0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZR1gFwMrYKFPrj1-duSnTCRlzCy4Ssar9wJTYytlzwM"
+            }
+            req2 = requests.delete(u2, headers=headers)
+
+            print(req2.text)
+            print(req2.status_code)
+
+
+# Printing all the options so that the user can pick which one he/she wants to do
+print("1. Get guest session ID,",
+      "2. Rate movie by name,",
+      "3. Get movie ID based on name,",
+      "4. Get list of rated movies,",
+      "5. Delete rating,",
+      "6. Delete all ratings,",
+      "7. Quit Program")
+o = 0
+while o != 7:
+    o = int(input("Please enter which option you would like to do: "))
+    if o not in range(1, 7):
+        print("Please enter a valid request.")
+        quit()
+
+    # Instantiating the class TMDBclient
+    tmdb_client = TMDBclient()
+
+    # In all the following lines I am calling the methods for their corresponding number along with some variables from other methods they may need
+    if o == 1:
+
+        request = tmdb_client.GetGuestSessionID()
+        # Because in a rest api the data always comes out in a big json file I need to parse it first (parsing means comprehending)
+        data = json.loads(request.text)
+
+        # Accessing the data to single out what I specifically need
+        r = data["guest_session_id"]
+        print('Guest session id: ', r)
+        tmdb_client.GetGuestSessionID()
+
+    elif o == 2:
+        tmdb_client.AddRatingtoMovie()
+
+    elif o == 3:
+        g = tmdb_client.GetMovieDetailsBasedOnName()
+
+        # Parsing the data (comprehending the data) of the json file
+        data = json.loads(g.text)
+
+        # Accessing the data of the file
+        d = data["results"][0]["id"]
+        print("Movie id: ", d)
+        tmdb_client.GetMovieDetailsBasedOnName()
+
+    elif o == 4:
+        r = tmdb_client.GetGuestSessionID()
+        # results = tmdb_client.GettingListOfRatedMovies()
+        tmdb_client.GettingListOfRatedMovies()
+
+    elif o == 5:
+        d = tmdb_client.GetMovieDetailsBasedOnName()
+        tmdb_client.DeleteMovieRating()
+
+    elif o == 6:
+        results = tmdb_client.GettingListOfRatedMovies()
+        for ele in results:
+            print('ele: ', ele)
+            id = ele["id"]
+            tmdb_client.DeleteAllRatings(id)
+else:
+    quit()
