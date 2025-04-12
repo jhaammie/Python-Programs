@@ -3,7 +3,7 @@ import psycopg2
 
 def __GetdbConn():
     connection = psycopg2.connect(
-        dbname="BMS",
+        dbname="bms",
         user="postgres",
         password="password",
         host="localhost"
@@ -62,8 +62,9 @@ def exists(TitleOfBook, AuthorOfBook):
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)
-        data = cursor.fetchall()
+        data = cursor.fetchone()
         print(data)
+        print(f"{query}: QUERY")
 
         cursor.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -72,9 +73,4 @@ def exists(TitleOfBook, AuthorOfBook):
         if connection is not None:
             connection.close()
             print('Database connection closed.')
-    return data
-
-
-# SortedBy("author")
-# insertbook("Harry Potter and the chamber of secrets", "J.K.Rowling")
-# SortBooks("")
+    return data[0]

@@ -3,7 +3,7 @@ import psycopg2
 
 # Establish SQLite database connection
 conn = psycopg2.connect(
-    dbname="university",
+    dbname="university1",
     user="postgres",
     password="password",
     host="localhost"

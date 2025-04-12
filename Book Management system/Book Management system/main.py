@@ -5,11 +5,12 @@
 from flask import Flask, request
 from flask_cors import CORS
 from book import Book
-from BookSortUtility import sortByTitle, sortByAuthor
+from BookSortUtility import sortByAuthor
 # Defining app
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)  # Allows a web page to access restricted resources from a server on a domain different from the domain that served the web page
 
+# Everything from this list goes away when you shut it down
 lstOfBooks = []
 
 

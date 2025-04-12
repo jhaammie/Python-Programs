@@ -15,13 +15,13 @@ def addBook():
     content = request.json
     a = content["title"]
     b = content["author"]
-
+    print(a, b)
     if a is None or a.strip() == "":  # Strip() removes extra whitespaces and specified characters from the start and from the end of the strip irrespective of how the parameter is passed.
         return "Please enter a valid title", 400
     elif b is None or b.strip() == "":
         return "Please enter a valid author", 400
     book = Book(b.strip(), a.strip())
-
+    print(book)
     if not exists(book.getTitle(), book.getAuthor()):
         insertbook(book.getTitle(), book.getAuthor())
         return "Book successfully added!"
@@ -54,10 +54,9 @@ def Sort():
 
 # Creating function because it's common in both getBooks and Sort
 def ConvertToJsonList(CopyOfLst, Newlst):
-    for name, author, id in CopyOfLst:
+    for id, name, author in CopyOfLst:
         book = {"title": name, "author": author}
         Newlst.append(book)
-    # Newlst.append(json.dumps([{"title": name, "author": author} for name, author, id in CopyOfLst]))
 
 
 if __name__ == '__main__':
