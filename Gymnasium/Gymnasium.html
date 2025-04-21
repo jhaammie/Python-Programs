@@ -41,7 +41,23 @@
     // API call: lat + long + radius
     function getGymnasiumWithInRadius(latitude, longitude) {
       const radius = document.getElementById("radius").value;
-      fetch("http://127.0.0.1:5000/gymnasium-radius", {
+      if(radius <= 0 || radius > 1573) {
+        document.getElementById("location").innerHTML = "Enter a valid radius value";
+        return
+      }
+      const sortBy = document.getElementById("sortBy").value;
+      const program = document.getElementById("program").value;
+      const radios = document.getElementsByName('SortOrder');
+      let selectedSortOrder = '';
+      for (const radio of radios) {
+        if (radio.checked) {
+          selectedSortOrder = radio.value;
+          break;
+        }
+      }
+      const minMerit = document.getElementById("minMerit").value;
+      const maxMerit = document.getElementById("maxMerit").value;
+      fetch("http://127.0.0.1:5000/gymnasium-within-radius", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -49,7 +65,12 @@
         body: JSON.stringify({
           latitude: latitude,
           longitude: longitude,
-          radius: radius
+          radius: radius,
+          sortBy: sortBy,
+          sortOrder: selectedSortOrder,
+          minMerit: minMerit,
+          maxMerit: maxMerit,
+          program: program
         })
       })
         .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
@@ -59,6 +80,10 @@
 
     // Shared response rendering
     function renderGymnasiumData(data) {
+      if (data && data.length == 0) {
+        document.getElementById("GymnasiumListData").innerHTML = "No gymnasium found";
+        return
+      }
       console.log(data);
       let row = "";
       for (let i = 0; i < data.length; i++) {
@@ -105,10 +130,61 @@
 
 <body>
 
+<button onclick="getLocation(getNearestGymnasium)" type="button">Get Gymnasiums Near Me (top ten)</button>
+
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+
+<label for="sortBy">Sort by:</label>
+<select name="sortBy" id="sortBy">
+  <option value="skola" selected>Name</option>
+  <option value="antagningsgräns">Antagningsgräns</option>
+  <option value="median">Median</option>
+  <option value="studieväg">Studieväg</option>
+</select>
+
+     <input type="radio" id="asc" name="SortOrder" value="asc" checked>
+     <label for="asc">Ascending</label>
+     <input type="radio" id="desc" name="SortOrder" value="desc">
+     <label for="desc">Descending</label>
+ <br/>
+
+<select name="program" id="program" multiple>
+    <option value="natur" selected>Natur</option>
+    <option value="sam">Samhäll</option>
+    <option value="ek">Ekonomi</option>
+    <option value="estet">Estet</option>
+    <option value="teknik">Teknik</option>
+    <option value="el">El och energi</option>
+    <option value="naturbruk">Naturbruk</option>
+    <option value="bandf">Barn och fritid</option>
+    <option value="FörsäljningsochService">Försäljnings och Service</option>
+    <option value="fordon">Fordon och transport</option>
+    <option value="Frisör">Frisör och stylist</option>
+    <option value="hu">Humanistiska</option>
+    <option value="bygg">Bygg och anläggning</option>
+    <option value="vård">Vård och omsorg</option>
+    <option value="res">Resturaung och livsmedel</option>
+    <option value="international">International Baccalaureate</option>
+
+</select>
+
+ <br/>
+<label>Minimum merit:</label>
+<input type="number" id="minMerit" name="minMerit" value=0 min = 0 max = 335>
+<label>Maximum merit:</label>
+<input type="number" id="maxMerit" name="maxMerit" value=340 min = 0 max = 340>
+<br/>
+<br/>
   <label>Enter the radius: </label><input type="number" id="radius">
   <button onclick="getLocation(getGymnasiumWithInRadius)" type="button">Get Gymnasiums within radius (km)</button>
-  <button onclick="getLocation(getNearestGymnasium)" type="button">Get Gymnasiums Near Me (top ten)</button>
-  <p id="location"></p>
+
+
+
+<p id="location"></p>
+
   <table id="GymnasiumList">
     <tr>
       <th>Name</th>
