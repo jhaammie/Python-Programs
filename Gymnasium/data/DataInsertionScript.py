@@ -70,7 +70,7 @@ for file_path in excel_files:
     filename = os.path.basename(file_path)
     year_match = re.search(r'(\d{4})', filename)
     år = int(year_match.group(1)) if year_match else None
-    är_preliminär = 'preliminär' in filename.lower()
+    är_preliminär = True if 'prelim' in filename.lower() else False
     
     # --- Read Excel file ---
     df = pd.read_excel(file_path)
@@ -101,8 +101,8 @@ for file_path in excel_files:
                 continue
             cur.execute(insert_query, data)
         except psycopg2.Error as e:
-            print(f"❌ Error inserting data from file '{file_path}': {row}")
-            continue
+            print(f"❌ Error inserting data from file '{file_path}': {row}, Error: {e}")
+            break
 
 # --- Commit and close ---
 conn.commit()
