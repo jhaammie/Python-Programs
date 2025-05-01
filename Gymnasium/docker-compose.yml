@@ -16,9 +16,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: posrgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: gymnasium
+      DB_NAME: gymnasium
+      PASSWORD: password
+      USER: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
