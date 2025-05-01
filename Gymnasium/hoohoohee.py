@@ -1,11 +1,15 @@
-import psycopg2
+import os
 
+import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
 def __GetdbConn():
     connection = psycopg2.connect(
-        dbname="gymnasium",
-        user="postgres",
-        password="password",
-        host="localhost"
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("USER"),
+        password=os.getenv("PASSWORD"),
+        host=os.getenv("HOST")
     )
     return connection
 
@@ -13,7 +17,7 @@ def GetListOfSchoolNames(pagenumber, pagesize):
     data = []
     offset = pagenumber*pagesize
     try:
-        query = f"select distinct skola from gymnasium order by skola limit {pagesize} offset {offset}"
+        query = f"select distinct skola from gymnasium where skola not in (select distinct name from school) order by skola limit {pagesize} offset {offset}"
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)
@@ -49,7 +53,7 @@ def InsertSchool(schoolname, latitude, longitude):
 def GetCountOfDistinctSchools():
     data = 0
     try:
-        query = "select count (distinct skola) from gymnasium"
+        query = "select count(distinct skola) from gymnasium where skola not in (select distinct name from school)"
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)

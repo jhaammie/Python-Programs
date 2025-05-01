@@ -3,16 +3,19 @@ import psycopg2
 import re
 import os
 from glob import glob
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- CONFIGURE THESE ---
 DB_CONFIG = {
-    "dbname":"gymnasium",
-    "user":"postgres",
-    "password":"password",
-    "host":"localhost"
+    "dbname":os.getenv("DB_NAME"),
+    "user":os.getenv("USER"),
+    "password":os.getenv("PASSWORD"),
+    "host":os.getenv("HOST")
 }
 
-FOLDER_PATH = os.getcwd() + "/Gymnasium/data"  # Path where your Excel files are stored
+FOLDER_PATH = os.getcwd()  # Path where your Excel files are stored
 
 # --- Define expected columns and possible alternatives ---
 COLUMN_MAPPING = {
@@ -34,11 +37,11 @@ cur = conn.cursor()
 
 # --- Prepare INSERT statement ---
 insert_query = """
-    INSERT INTO public.gymnasium (
+    insert into public.gymnasium (
         "år", "är_preliminär", kommun, skola, organistionsform,
         "studievägskod", "studieväg", "antagningsgräns", median,
         antal_platser, antagna, reserver, lediga_platser
-    ) VALUES (
+    ) values (
         %(år)s, %(är_preliminär)s, %(kommun)s, %(skola)s, %(organistionsform)s,
         %(studievägskod)s, %(studieväg)s, %(antagningsgräns)s, %(median)s,
         %(antal_platser)s, %(antagna)s, %(reserver)s, %(lediga_platser)s
@@ -69,7 +72,7 @@ for file_path in excel_files:
     # --- Extract year and preliminary status from filename ---
     filename = os.path.basename(file_path)
     year_match = re.search(r'(\d{4})', filename)
-    år = int(year_match.group(1)) if year_match else None
+    år = int(year_match.group(1)) if year_match else 1900
     är_preliminär = True if 'prelim' in filename.lower() else False
     
     # --- Read Excel file ---
