@@ -4,7 +4,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "https://hw.edigistay.com"}})
 
-@app.route('/hello')
+@app.route('/api/hello')
 def hello_world():
     return 'Hello, World from Python Backend!'
 
