@@ -117,4 +117,4 @@ if __name__ == "__main__":
     create_school_table()
     add_postgis_extension()
     insert_data_from_excel()
-    PopulateLocation()
+    # PopulateLocation()
