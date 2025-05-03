@@ -5,19 +5,19 @@ services:
     build: .
     container_name: backend_app
     restart: always
-    env_file: .env
+    env_file: .env-prod
     depends_on:
       - db
     expose:
       - "5000"
 
   db:
-    image: postgres:15
+    image: postgis/postgis:15-3.4
     container_name: postgres_db
     restart: always
     environment:
       POSTGRES_USER: postgres  
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: XoGvI0vSeqxsQv6
       POSTGRES_DB: gymnasium
     volumes:
       - postgres_data:/var/lib/postgresql/data
