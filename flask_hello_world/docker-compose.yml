@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  flask-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./backend:/app
+    restart: always
+
+  # nginx-frontend:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:5006"
+  #   volumes:
+  #     - ./static:/usr/share/nginx/html
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - flask-backend
+  #   restart: always

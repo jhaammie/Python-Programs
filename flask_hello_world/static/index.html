@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Response</title>
+    <script>
+        async function fetchApiResponse() {
+            try {
+                const response = await fetch('http://hw.edigistay.com/api/hello');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.text();
+                document.getElementById('apiResponse').innerText = data;
+            } catch (error) {
+                document.getElementById('apiResponse').innerText = `Error: ${error.message}`;
+            }
+        }
+
+        window.onload = fetchApiResponse;
+    </script>
+</head>
+
+<body>
+    <h1>API Response</h1>
+    <p id="apiResponse">Loading...</p>
+</body>
+
+</html>
