@@ -5,7 +5,7 @@ from hoohoohee import GetNearestSchools, GetDataForSchools, GetGymnasiumWithinRa
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)
 
-@app.route('/health-checl', methods=["GET"])
+@app.route('/health-check', methods=["GET"])
 def HealthCheck():
     return "OK"
 
