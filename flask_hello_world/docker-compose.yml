@@ -3,7 +3,7 @@ version: '3.8'
 services:
   flask-backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
     ports:
       - "5005:5005"
