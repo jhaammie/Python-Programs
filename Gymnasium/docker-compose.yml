@@ -16,7 +16,7 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: postgres  # Corrected
+      POSTGRES_USER: postgres  
       POSTGRES_PASSWORD: password
       POSTGRES_DB: gymnasium
     volumes:
