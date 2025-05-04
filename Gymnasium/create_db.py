@@ -1,5 +1,5 @@
 import psycopg2
-from Hahahaha import PopulateLocation
+# from Hahahaha import PopulateLocation
 from data.DataInsertionScript import insert_data_from_excel
 from dotenv import load_dotenv
 import os
@@ -14,7 +14,8 @@ def create_gymnasium_table():
             dbname=os.getenv("DB_NAME"),
             user=os.getenv("USER"),
             password=os.getenv("PASSWORD"),
-            host=os.getenv("HOST")
+            host=os.getenv("HOST"),
+            port=os.getenv("PORT")
         )
         cursor = connection.cursor()
 
@@ -42,10 +43,10 @@ def create_gymnasium_table():
         cursor.execute(create_table_query)
         connection.commit()
         print("Table 'gymnasium' created successfully.")
-
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error:
         print(f"Error while working with PostgreSQL: {error}")
-    finally:
         if connection:
             cursor.close()
             connection.close()
@@ -59,7 +60,8 @@ def create_school_table():
             dbname=os.getenv("DB_NAME"),
             user=os.getenv("USER"),
             password=os.getenv("PASSWORD"),
-            host=os.getenv("HOST")
+            host=os.getenv("HOST"),
+            port=os.getenv("PORT")
         )
         cursor = connection.cursor()
 
@@ -77,10 +79,10 @@ def create_school_table():
         cursor.execute(create_school_table_query)
         connection.commit()
         print("Table 'school' created successfully.")
-
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error:
         print(f"Error while working with PostgreSQL: {error}")
-    finally:
         if connection:
             cursor.close()
             connection.close()
@@ -93,7 +95,8 @@ def add_postgis_extension():
             dbname=os.getenv("DB_NAME"),
             user=os.getenv("USER"),
             password=os.getenv("PASSWORD"),
-            host=os.getenv("HOST")
+            host=os.getenv("HOST"),
+            port=os.getenv("PORT")
         )
         cursor = connection.cursor()
 
@@ -102,10 +105,10 @@ def add_postgis_extension():
         cursor.execute(add_extension_query)
         connection.commit()
         print("PostGIS extension added successfully.")
-
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error:
         print(f"Error while working with PostgreSQL: {error}")
-    finally:
         if connection:
             cursor.close()
             connection.close()

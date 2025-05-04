@@ -121,7 +121,7 @@ def insert_data_from_excel():
                     data['lediga_platser'] = -1
                 cur.execute(insert_query, data)
             except psycopg2.Error as e:
-                print(f"❌ Error inserting data from file '{file_path}': {row}, Error: {e}")
+                print(f"❌ Error inserting data from file '{file_path}': {data}, Error: {e}")
                 break
 
     # --- Commit and close ---
