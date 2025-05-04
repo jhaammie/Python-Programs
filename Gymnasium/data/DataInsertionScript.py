@@ -12,13 +12,15 @@ def insert_data_from_excel():
     # --- CONFIGURE THESE ---
     DB_CONFIG = {
         "dbname":os.getenv("DB_NAME"),
-        "user":os.getenv("USER"),
-        "password":os.getenv("PASSWORD"),
-        "host":os.getenv("HOST")
+        "user":os.getenv("DB_USER"),
+        "password":os.getenv("DB_PASSWORD"),
+        "host":os.getenv("DB_HOST")
     }
 
     FOLDER_PATH = os.getcwd()  # Path where your Excel files are stored
-    if not FOLDER_PATH.endswith('data'):
+    if os.path.normpath('gymnasium/data') not in os.path.normpath(FOLDER_PATH).lower():
+        FOLDER_PATH = os.path.join(FOLDER_PATH, 'Gymnasium', 'data')
+    if os.path.normpath('data') not in os.path.normpath(FOLDER_PATH).lower():
         FOLDER_PATH = os.path.join(FOLDER_PATH, 'data')
 
     # --- Define expected columns and possible alternatives ---
@@ -28,6 +30,7 @@ def insert_data_from_excel():
         'studievägskod': ['Studievägskod', 'studievägskod', 'StudieVagKod'],
         'studieväg': ['Studieväg', 'Studievag'],
         'antagningsgräns': ['Antagningsgräns', 'Antagningsgrans', 'antagningsgräns'],
+        'organistionsform': ['Organistionsform', 'organistionsform', 'Organistionsform'],
         'median': ['Median', 'medianvärde', 'Medianvärde', 'median'],
         'antal_platser': ['AntalPlatser', 'Antal platser', 'Platser', 'antal platser', 'antal_platser'],
         'antagna': ['Antagna', 'Antagna elever', 'antagna', 'AntalAntagna'],
@@ -62,7 +65,7 @@ def insert_data_from_excel():
                     break
             else:
                 if target_col == 'organistionsform':
-                    col_map[target_col] = 'organistionsform'
+                    continue
                 else:
                     raise ValueError(f"❌ Error in file '{file_path}': Missing required column for '{target_col}'.")
         return col_map
@@ -103,9 +106,19 @@ def insert_data_from_excel():
                 'lediga_platser': row[col_map['lediga_platser']],
             }
             try:
+                # --- Convert 'P' to -1 for specific columns ---
+                if data['antagningsgräns'] == 'P':
+                    data['antagningsgräns'] = -1
+                if data['median'] == 'P':
+                    data['median'] = -1
                 if data['antal_platser'] == 'P':
-                    print(f"⚠️ Skipping row with P in 'antal_platser' in file '{file_path}'")
-                    continue
+                    data['antal_platser'] = -1
+                if data['antagna'] == 'P':
+                    data['antagna'] = -1
+                if data['reserver'] == 'P':
+                    data['reserver'] = -1
+                if data['lediga_platser'] == 'P':
+                    data['lediga_platser'] = -1
                 cur.execute(insert_query, data)
             except psycopg2.Error as e:
                 print(f"❌ Error inserting data from file '{file_path}': {row}, Error: {e}")
@@ -117,3 +130,5 @@ def insert_data_from_excel():
     conn.close()
 
     print("✅ All files processed and data inserted successfully!")
+
+insert_data_from_excel()

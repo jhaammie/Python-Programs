@@ -3,7 +3,6 @@ from Hahahaha import PopulateLocation
 from data.DataInsertionScript import insert_data_from_excel
 from dotenv import load_dotenv
 import os
-from 
 
 load_dotenv()
 

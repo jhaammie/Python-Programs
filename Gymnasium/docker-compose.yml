@@ -29,12 +29,15 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx_static
+    environment:
+      - API_BASE_URL=https://gymnasium.edigistay.com
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
     ports:
       - "8006:8006"
     depends_on:
       - backend
+    entrypoint: ["/bin/sh", "-c", "/entrypoint.sh && nginx -g 'daemon off;'"]
 
 volumes:
   postgres_data:
