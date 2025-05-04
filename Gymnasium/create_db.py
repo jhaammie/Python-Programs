@@ -72,8 +72,7 @@ def create_school_table():
             id SERIAL PRIMARY KEY,
             name VARCHAR(50) NOT NULL,
             latitude DOUBLE PRECISION NOT NULL,
-            longitude DOUBLE PRECISION NOT NULL,
-            CONSTRAINT fk_school_name FOREIGN KEY (name) REFERENCES public.gymnasium(skola)
+            longitude DOUBLE PRECISION NOT NULL
         )
         """
         cursor.execute(create_school_table_query)
