@@ -1,3 +1,3 @@
 const CONFIG = {
-  API_BASE_URL: "http://127.0.0.1:5006",
+  API_BASE_URL: "https://gymnasium.edigistay.com",
 };

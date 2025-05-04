@@ -38,7 +38,7 @@ services:
       - "8006:80"
     depends_on:
       - backend
-    entrypoint: ["/bin/sh", "-c", "/entrypoint.sh && nginx -g 'daemon off;'"]
+    # entrypoint: ["/bin/sh", "-c", "/entrypoint.sh && nginx -g 'daemon off;'"]
 
 volumes:
   postgres_data:
