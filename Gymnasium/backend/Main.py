@@ -5,11 +5,11 @@ from hoohoohee import GetNearestSchools, GetDataForSchools, GetGymnasiumWithinRa
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)
 
-@app.route('/health-check', methods=["GET"])
+@app.route('/api/health-check', methods=["GET"])
 def HealthCheck():
     return "OK"
 
-@app.route('/gymnasium', methods=["POST"])
+@app.route('/api/gymnasium', methods=["POST"])
 def GetNearestGymnasium():
     content = request.json
     a = content["latitude"]
@@ -44,7 +44,7 @@ def GetNearestGymnasium():
         list.append(d)
     return list
 
-@app.route('/gymnasium-within-radius', methods=["POST"])
+@app.route('/api/gymnasium-within-radius', methods=["POST"])
 def GymnasiumWithinRadius():
     content = request.json
     a = content["latitude"]
