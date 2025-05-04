@@ -33,6 +33,7 @@ services:
       - API_BASE_URL=https://gymnasium.edigistay.com
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
+      - ./entrypoint.sh:/entrypoint.sh:ro
     ports:
       - "8006:80"
     depends_on:
