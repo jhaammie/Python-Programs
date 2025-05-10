@@ -93,12 +93,12 @@ def GetDataForSchools(lst, sortby, sortOrder, minMerit=0, maxMerit=1000, program
     data = []
     try:
         if sortby is None:
-            query = f"select * from gymnasium where skola in ({placeholders})"
+            query = f"select * from prelim_final_gymnasium where skola in ({placeholders})"
         else:
-            query = f"select * from gymnasium where skola in ({placeholders})"
+            query = f"select * from prelim_final_gymnasium where skola in ({placeholders})"
             if program is not None:
                 query = f"{query} and studieväg ilike '{program}%' "
-            query = f"{query} and antagningsgräns between {minMerit} and {maxMerit} order by {sortby} {sortOrder}"
+#            query = f"{query} and antagningsgräns between {minMerit} and {maxMerit} order by {sortby} {sortOrder}"
 
         connection = __GetdbConn()
         cursor = connection.cursor()

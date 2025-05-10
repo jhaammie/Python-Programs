@@ -70,19 +70,28 @@ def GymnasiumWithinRadius():
 
     list = []
     for school in DataList:
-        d = {"Year":school[1],
-              "Is_Preliminary": school[2],
-              "Kommun": school[3],
-              "Name":school[4],
-               "Organisitionsform":school[5],
-               "Studievagskod":school[6],
-               "Studievag":school[7],
-               "Antagningsgrans":school[8],
-               "Median":school[9],
-              "Antal_platser":school[10],
-              "Antagna":school[11],
-              "Reserver":school[12],
-              "Lediga_platser":school[13]
+        print(school)
+        d = {"Year":school[0],
+              "Kommun": school[1],
+              "Name":school[2],
+               "Organisitionsform":school[3],
+               "Studievagskod":school[4],
+               "Studievag":school[5],
+               "Antagningsgrans_prelim":school[6],
+               "Antagningsgrans_final": school[7],
+               "Median_prelim":school[8],
+               "Median_final": school[9],
+               "Antal_platser_prelim":school[10],
+               "Antal_platser_final": school[11],
+               "Antagna_prelim":school[12],
+               "Antagna_final": school[13],
+               "Reserver_prelim":school[14],
+               "Reserver_final": school[15],
+               "Lediga_platser_prelim":school[16],
+               "Lediga_platser_final": school[17],
+                "grans_diff":school[18],
+                "median_diff":school[19]
+
              }
         list.append(d)
     return list
