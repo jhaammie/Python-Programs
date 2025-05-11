@@ -32,7 +32,7 @@ services:
     environment:
       - API_BASE_URL=https://gymnasium.edigistay.com
     volumes:
-      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend:/usr/share/nginx/html:rx
       - ./entrypoint.sh:/entrypoint.sh
     ports:
       - "8006:80"
