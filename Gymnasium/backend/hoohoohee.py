@@ -25,11 +25,13 @@ def GetListOfSchoolNames(pagenumber, pagesize):
         data = cursor.fetchall()
 
         cursor.close()
+        connection.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
+
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
            # print('Database connection closed.')
     return data
 
@@ -43,12 +45,12 @@ def InsertSchool(schoolname, latitude, longitude):
         cursor.execute(sql, val)
 
         connection.commit()
-
+        connection.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
             # print('Database connection closed.')
 
 def GetCountOfDistinctSchools():
@@ -60,12 +62,12 @@ def GetCountOfDistinctSchools():
         cursor.execute(query)
         data = cursor.fetchall()
         cursor.close()
-
+        connection.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
             # print('Database connection closed.')
     return data[0][0]
 
@@ -79,11 +81,12 @@ def GetNearestSchools(latitude, longitude,count):
         data = cursor.fetchall()
 
         cursor.close()
+        connection.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
            # print('Database connection closed.')
     return data
 
@@ -107,11 +110,12 @@ def GetDataForSchools(lst, sortby, sortOrder, minMerit=0, maxMerit=1000, program
         data = cursor.fetchall()
 
         cursor.close()
+        connection.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
         # print('Database connection closed.')
     return data
 
@@ -125,11 +129,12 @@ def GetGymnasiumWithinRadius(latitude, longitude, radius):
         data = cursor.fetchall()
 
         cursor.close()
+        connection.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
+    # finally:
+    #     if connection is not None:
+    #         connection.close()
         # print('Database connection closed.')
     return data
 
