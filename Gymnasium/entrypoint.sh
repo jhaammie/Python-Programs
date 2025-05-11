@@ -2,9 +2,9 @@
 echo "Starting entrypoint script..."
 echo "Environment variable API_BASE_URL: ${API_BASE_URL}"
 echo "Creating config.js file..."
-cat <<EOF > /usr/share/nginx/html/config.js
+cat <<EOF > /usr/share/nginx/html/url_config.js
 window.CONFIG = {
-  API_BASE_URL: "${API_BASE_URL}"
+  API_BASE_URL: "${API_BASE_URL}/api"
 };
 EOF
 
