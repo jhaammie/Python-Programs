@@ -35,7 +35,7 @@
 
     function getGymnasiumWithInRadius(latitude, longitude) {
       const radius = document.getElementById("radius").value;
-      if (radius <= 0 || radius > 1573) {
+      if (radius <= 0 || radius > 8000) {
         document.getElementById("location").innerHTML = "Enter a valid radius value";
         return;
       }

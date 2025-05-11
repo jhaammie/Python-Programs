@@ -9,4 +9,3 @@ RUN chmod +x /entrypoint.sh
 
 # Use custom entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]
