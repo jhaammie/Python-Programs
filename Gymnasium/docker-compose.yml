@@ -27,16 +27,19 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   nginx:
-    build:
-      context: .
-      dockerfile: nginx.Dockerfile
+    image: nginx:alpine
     container_name: nginx_static
     environment:
       - API_BASE_URL=https://gymnasium.edigistay.com
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./entrypoint.sh:/entrypoint.sh
     ports:
       - "8006:80"
     depends_on:
       - backend
+    entrypoint: ["/bin/sh", "-c", "/entrypoint.sh && nginx -g 'daemon off;'"]
+    restart: always
 
 volumes:
   postgres_data:

@@ -10,7 +10,6 @@ EOF
 
 echo "Config file created..."
 
-exec nginx -g 'daemon off;'
 echo "Nginx started..."
 echo "Entrypoint script completed."
 # This script creates a config.js file in the Nginx HTML directory with the API_BASE_URL environment variable.
