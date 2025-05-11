@@ -36,6 +36,7 @@ services:
       - ./entrypoint.sh:/entrypoint.sh
     ports:
       - "8006:80"
+    command: ["/bin/sh", "-c", "chmod +x /entrypoint.sh"]
     depends_on:
       - backend
     entrypoint: ["/bin/sh", "-c", "/entrypoint.sh && nginx -g 'daemon off;'"]
