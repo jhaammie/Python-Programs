@@ -48,13 +48,16 @@
           break;
         }
       }
-      const minMerit = document.getElementById("minMerit").value;
-      const maxMerit = document.getElementById("maxMerit").value;
+      const year = document.getElementById("year").value;
+      const minpreMerit = document.getElementById("minPrelimMerit").value;
+      const maxpreMerit = document.getElementById("maxPrelimMerit").value;
+      const minfinMerit = document.getElementById("minFinalMerit").value;
+      const maxfinMerit = document.getElementById("maxFinalMerit").value;
 
       fetch("http://127.0.0.1:5006/gymnasium-within-radius", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude, longitude, radius, sortBy, sortOrder: selectedSortOrder, minMerit, maxMerit, program })
+        body: JSON.stringify({ latitude, longitude, radius, sortBy, sortOrder: selectedSortOrder, minpreMerit, maxpreMerit, program, year, minfinMerit, maxfinMerit})
       })
         .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
         .then(renderGymnasiumData)
@@ -169,6 +172,17 @@ function renderGymnasiumData(data) {
       <button onclick="getLocation(getGymnasiumWithInRadius)" class="btn btn-success" type="button">Få gymnasiet inom
         radie</button>
     </div>
+      <div class="col-md-6 mb-3">
+        <label for="year" class="form-label">År:</label>
+        <select class="form-select" id="year">
+          <option value="2025" selected>2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2022">2022</option>
+          <option value="2021">2021</option>
+          <option value="2020">2020</option>
+        </select>
+      </div>
 
     <div class="row mb-4">
       <div class="col-md-6 mb-3">
@@ -229,14 +243,26 @@ function renderGymnasiumData(data) {
       </div>
 
       <div class="col-md-6 mb-3">
-        <label for="minMerit" class="form-label">Minimum merit:</label>
-        <input type="number" id="minMerit" class="form-control" value="0" min="0" max="335">
+        <label for="minPrelimMerit" class="form-label">Preliminär minimum merit:</label>
+        <input type="number" id="minPrelimMerit" class="form-control" value="0" min="0" max="335">
       </div>
 
       <div class="col-md-6 mb-3">
-        <label for="maxMerit" class="form-label">Maximal merit:</label>
-        <input type="number" id="maxMerit" class="form-control" value="340" min="0" max="340">
+        <label for="maxPrelimMerit" class="form-label">Preliminär maximal merit:</label>
+        <input type="number" id="maxPrelimMerit" class="form-control" value="340" min="0" max="340">
       </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="minFinalMerit" class="form-label">Slutlig minimum merit:</label>
+        <input type="number" id="minFinalMerit" class="form-control" value="0" min="0" max="335">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="maxFinalMerit" class="form-label">Slutlig maximal merit:</label>
+        <input type="number" id="maxFinalMerit" class="form-control" value="340" min="0" max="340">
+      </div>
+
+
     </div>
 
     <div id="location" class="text-center text-danger mb-4"></div>

@@ -27,20 +27,29 @@ def GetNearestGymnasium():
     print(DataList[0])
     list = []
     for school in DataList:
-        d = {"Year":school[1],
-              "Is_Preliminary": school[2],
-              "Kommun": school[3],
-              "Name":school[4],
-               "Organisitionsform":school[5],
-               "Studievagskod":school[6],
-               "Studievag":school[7],
-               "Antagningsgrans":school[8],
-               "Median":school[9],
-              "Antal_platser":school[10],
-              "Antagna":school[11],
-              "Reserver":school[12],
-              "Lediga_platser":school[13]
+        d = {"Year":school[0],
+               "Kommun": school[1],
+               "Name":school[2],
+               "Organisitionsform":school[3],
+               "Studievagskod":school[4],
+               "Studievag":school[5],
+               "Antagningsgrans_prelim":school[6],
+               "Antagningsgrans_final": school[7],
+               "Median_prelim":school[8],
+               "Median_final": school[9],
+               "Antal_platser_prelim":school[10],
+               "Antal_platser_final": school[11],
+               "Antagna_prelim":school[12],
+               "Antagna_final": school[13],
+               "Reserver_prelim":school[14],
+               "Reserver_final": school[15],
+               "Lediga_platser_prelim":school[16],
+               "Lediga_platser_final": school[17],
+                "grans_diff":school[18],
+                "median_diff":school[19]
+
              }
+
         list.append(d)
     return list
 
@@ -52,9 +61,12 @@ def GymnasiumWithinRadius():
     radius = content["radius"]
     sortby = content["sortBy"]
     sortOrder = content["sortOrder"]
-    minMerit = content["minMerit"]
-    maxMerit = content["maxMerit"]
+    minpreMerit = content["minpreMerit"]
+    maxpreMerit = content["maxpreMerit"]
+    minfinMerit = content["minfinMerit"]
+    maxfinMerit = content["maxfinMerit"]
     program = content["program"]
+    year = content["year"]
     lst = []
     schools = GetGymnasiumWithinRadius(a, b, radius)
 #    for a in range(0, len(schools)):
@@ -63,14 +75,13 @@ def GymnasiumWithinRadius():
 
     for school in schools:
         lst.append(school[0])
-    DataList = GetDataForSchools(lst, sortby, sortOrder, minMerit, maxMerit, program)
+    DataList = GetDataForSchools(lst, sortby, sortOrder, minpreMerit, minfinMerit, maxpreMerit, maxfinMerit, program, year)
     if len(DataList) > 0:
         print(DataList[0])
 
 
     list = []
     for school in DataList:
-        print(school)
         d = {"Year":school[0],
               "Kommun": school[1],
               "Name":school[2],
@@ -91,7 +102,6 @@ def GymnasiumWithinRadius():
                "Lediga_platser_final": school[17],
                 "grans_diff":school[18],
                 "median_diff":school[19]
-
              }
         list.append(d)
     return list
