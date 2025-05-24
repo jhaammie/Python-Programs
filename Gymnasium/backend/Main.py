@@ -65,7 +65,7 @@ def GymnasiumWithinRadius():
     maxpreMerit = content["maxpreMerit"]
     minfinMerit = content["minfinMerit"]
     maxfinMerit = content["maxfinMerit"]
-    program = content["program"]
+    programs = content["programs"]
     year = content["year"]
     lst = []
     schools = GetGymnasiumWithinRadius(a, b, radius)
@@ -75,7 +75,7 @@ def GymnasiumWithinRadius():
 
     for school in schools:
         lst.append(school[0])
-    DataList = GetDataForSchools(lst, sortby, sortOrder, minpreMerit, minfinMerit, maxpreMerit, maxfinMerit, program, year)
+    DataList = GetDataForSchools(lst, sortby, sortOrder, minpreMerit, minfinMerit, maxpreMerit, maxfinMerit, programs, year)
     if len(DataList) > 0:
         print(DataList[0])
 

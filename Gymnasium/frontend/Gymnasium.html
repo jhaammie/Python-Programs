@@ -39,7 +39,15 @@
         return;
       }
       const sortBy = document.getElementById("sortBy").value;
-      const program = document.getElementById("program").value;
+      const programOptions = document.getElementById("program").options;
+      console.log(programOptions)
+      const selectedPrograms = [];
+      for (const program of programOptions) {
+        if (program.selected) {
+          selectedPrograms.push(program.value);
+        }
+      }
+      console.log(selectedPrograms)
       const radios = document.getElementsByName('SortOrder');
       let selectedSortOrder = '';
       for (const radio of radios) {
@@ -57,7 +65,9 @@
       fetch("http://127.0.0.1:5006/gymnasium-within-radius", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude, longitude, radius, sortBy, sortOrder: selectedSortOrder, minpreMerit, maxpreMerit, program, year, minfinMerit, maxfinMerit})
+        body: JSON.stringify({ latitude, longitude, radius, sortBy,
+        sortOrder: selectedSortOrder, minpreMerit, maxpreMerit,
+        programs: selectedPrograms, year, minfinMerit, maxfinMerit})
       })
         .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
         .then(renderGymnasiumData)
@@ -189,8 +199,10 @@ function renderGymnasiumData(data) {
         <label for="sortBy" class="form-label">Sortera:</label>
         <select class="form-select" id="sortBy">
           <option value="skola" selected>Namn</option>
-          <option value="antagningsgräns">Antagningsgräns</option>
-          <option value="median">Median</option>
+          <option value="antagningsgräns_prelim">Antagningsgräns Prelim</option>
+          <option value="antagningsgräns_final">Antagningsgräns Final</option>
+          <option value="median_prelim">Median Prelim</option>
+          <option value="median_final">Median Final</option>
           <option value="studieväg">Studieväg</option>
         </select>
       </div>
@@ -209,7 +221,7 @@ function renderGymnasiumData(data) {
 
       <div class="col-md-6 mb-3">
         <label for="program" class="form-label">Studieväg:</label>
-        <select class="form-select" id="program">
+        <select class="form-select" id="program" multiple>
           <option value="natur" selected>Natur</option>
           <option value="sam">Samhäll</option>
           <option value="ek">Ekonomi</option>

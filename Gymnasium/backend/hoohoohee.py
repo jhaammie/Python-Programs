@@ -87,17 +87,22 @@ def GetNearestSchools(latitude, longitude,count):
     return data
 
 
-def GetDataForSchools(lst, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000, program=None, year=None):
+def GetDataForSchools(lst, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000,
+                      programs=None, year=None):
 
+    if programs is None:
+        programs = []
     placeholders = ",".join(f"'{name}'" for name in lst)
     data = []
     query = f"select * from prelim_final_gymnasium where skola in ({placeholders})"
     try:
 
-        if program is not None:
-            query = f"{query} and studieväg ilike '{program}%' "
+        if programs is not None:
+            joined_str = "|".join(programs)
+            query = f"{query} and studieväg ~* '^({joined_str})' "
 
         # ASK NISHA HOW 'NONE' IS POSSIBLE
+        # EXPLAnATION FOR PROGRAMs
         if year is not None:
             query = f"{query} and år = {year}"
         query = f"{query} and antagningsgräns_prelim between {minpreMerit} and {maxpreMerit}"
