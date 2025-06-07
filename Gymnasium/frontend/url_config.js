@@ -1,3 +1,3 @@
-const CONFIG = {
-  API_BASE_URL: "https://gymnasium.edigistay.com",
+window.CONFIG = {
+  API_BASE_URL: "http://localhost:5006/api",
 };
