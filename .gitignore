@@ -2,3 +2,4 @@ venv
 .vscode
 Gymnasium/.DS_Store
 .DS_Store
+Gymnasium/backend/__pycache__

@@ -91,19 +91,27 @@ def GetNearestSchools(latitude, longitude,count):
     return data
 
 
-def GetDataForSchools(lst, sortby, sortOrder, minMerit=0, maxMerit=1000, program=None):
+def GetDataForSchools(lst, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000,
+                      programs=None, year=None):
 
+    if programs is None:
+        programs = []
     placeholders = ",".join(f"'{name}'" for name in lst)
     data = []
+    query = f"select * from prelim_final_gymnasium where skola in ({placeholders})"
     try:
-        if sortby is None:
-            query = f"select * from gymnasium where skola in ({placeholders})"
-        else:
-            query = f"select * from gymnasium where skola in ({placeholders})"
-            if program is not None:
-                query = f"{query} and studieväg ilike '{program}%' "
-            query = f"{query} and antagningsgräns between {minMerit} and {maxMerit} order by {sortby} {sortOrder}"
 
+        if programs is not None:
+            joined_str = "|".join(programs)
+            query = f"{query} and studieväg ~* '^({joined_str})' "
+
+        if year is not None:
+            query = f"{query} and år = {year}"
+        query = f"{query} and antagningsgräns_prelim between {minpreMerit} and {maxpreMerit}"
+        query = f"{query} and (antagningsgräns_final between {minfinMerit} and {maxfinMerit} or antagningsgräns_final is null)"
+        if sortby is not None:
+            query = f"{query} order by {sortby} {sortOrder}"
+        print(query)
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)

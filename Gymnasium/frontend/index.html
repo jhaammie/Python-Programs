@@ -2,207 +2,125 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Hitta gymnasiet</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="./url_config.js"></script>
-  <script>
-    function getLocation(callback) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            callback(latitude, longitude);
-          },
-          showError
-        );
-      } else {
-        document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
-      }
-    }
-
-    function getNearestGymnasium(latitude, longitude) {
-      fetch(window.CONFIG.API_BASE_URL + "/gymnasium-within-radius", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude, longitude })
-      })
-        .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
-        .then(renderGymnasiumData)
-        .catch(error => console.error("Error:", error));
-    }
-
-    function getGymnasiumWithInRadius(latitude, longitude) {
-      const radius = document.getElementById("radius").value;
-      if (radius <= 0 || radius > 8000) {
-        document.getElementById("location").innerHTML = "Enter a valid radius value";
-        return;
-      }
-      const sortBy = document.getElementById("sortBy").value;
-      const program = document.getElementById("program").value;
-      const radios = document.getElementsByName('SortOrder');
-      let selectedSortOrder = '';
-      for (const radio of radios) {
-        if (radio.checked) {
-          selectedSortOrder = radio.value;
-          break;
-        }
-      }
-      const minMerit = document.getElementById("minMerit").value;
-      const maxMerit = document.getElementById("maxMerit").value;
-
-      fetch(window.CONFIG.API_BASE_URL + "/gymnasium-within-radius", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latitude, longitude, radius, sortBy, sortOrder: selectedSortOrder, minMerit, maxMerit, program })
-      })
-        .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
-        .then(renderGymnasiumData)
-        .catch(error => console.error("Error:", error));
-    }
-
-    function renderGymnasiumData(data) {
-      const listContainer = document.getElementById("GymnasiumListData");
-      listContainer.innerHTML = ""; // Clear previous content
-      if (!data || data.length === 0) {
-        listContainer.innerHTML = "<p class='text-center'>No gymnasium found</p>";
-        return;
-      }
-
-      let row = "<div class='row g-4'>";
-      for (let i = 0; i < data.length; i++) {
-        row += `
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">${data[i].Name}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">${data[i].Kommun} (${data[i].Year})</h6>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>Studieväg:</strong> ${data[i].Studievag} (${data[i].Studievagskod})</li>
-                <li class="list-group-item"><strong>Organisationsform:</strong> ${data[i].Organisitionsform}</li>
-                <li class="list-group-item"><strong>Antagningsgräns:</strong> ${data[i].Antagningsgrans}</li>
-                <li class="list-group-item"><strong>Median:</strong> ${data[i].Median}</li>
-                <li class="list-group-item"><strong>Platser:</strong> ${data[i].Antal_platser}</li>
-                <li class="list-group-item"><strong>Antagna:</strong> ${data[i].Antagna}</li>
-                <li class="list-group-item"><strong>Reserver:</strong> ${data[i].Reserver}</li>
-                <li class="list-group-item"><strong>Lediga platser:</strong> ${data[i].Lediga_platser}</li>
-              </ul>
-            </div>
-          </div>
-        </div>`;
-      }
-      row += "</div>";
-      listContainer.innerHTML = row;
-    }
-
-    function showError(error) {
-      let message = "";
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          message = "User denied the request for Geolocation.";
-          break;
-        case error.POSITION_UNAVAILABLE:
-          message = "Location information is unavailable.";
-          break;
-        case error.TIMEOUT:
-          message = "The request to get user location timed out.";
-          break;
-        case error.UNKNOWN_ERROR:
-          message = "An unknown error occurred.";
-          break;
-      }
-      document.getElementById("location").innerHTML = message;
-    }
-  </script>
+    <meta charset="UTF-8">
+    <title>Hitta gymnasiet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="url_config.js"></script>
+    <script src="Gymnasium.js"></script>
 </head>
 
 <body class="bg-light">
 
-  <div class="container py-5">
+    <div class="container py-5">
 
-    <h1 class="text-center mb-5">Hitta gymnasiet</h1>
+        <h1 class="text-center mb-5">Hitta gymnasiet</h1>
 
-    <div class="d-flex justify-content-center mb-4">
-      <!-- <button onclick="getLocation(getNearestGymnasium)" class="btn btn-primary me-2" type="button">Get Gymnasiums Near Me (top 10)</button>-->
-      <button onclick="getLocation(getGymnasiumWithInRadius)" class="btn btn-success" type="button">Få gymnasiet inom
-        radie</button>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col-md-6 mb-3">
-        <label for="sortBy" class="form-label">Sortera:</label>
-        <select class="form-select" id="sortBy">
-          <option value="skola" selected>Namn</option>
-          <option value="antagningsgräns">Antagningsgräns</option>
-          <option value="median">Median</option>
-          <option value="studieväg">Studieväg</option>
-        </select>
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label class="form-label d-block">Sortera:</label>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" id="asc" name="SortOrder" value="asc" checked>
-          <label class="form-check-label" for="asc">Stigande</label>
+        <div class="d-flex justify-content-center mb-4">
+            <!-- <button onclick="getLocation(getNearestGymnasium)" class="btn btn-primary me-2" type="button">Get Gymnasiums Near Me (top 10)</button>-->
+            <button onclick="getLocation(getGymnasiumWithInRadius)" class="btn btn-success" type="button">Få gymnasiet
+                inom
+                radie</button>
         </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" id="desc" name="SortOrder" value="desc">
-          <label class="form-check-label" for="desc">Fallande</label>
+        <div class="col-md-6 mb-3">
+            <label for="year" class="form-label">År:</label>
+            <select class="form-select" id="year">
+                <option value="2025" selected>2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+            </select>
         </div>
-      </div>
 
-      <div class="col-md-6 mb-3">
-        <label for="program" class="form-label">Studieväg:</label>
-        <select class="form-select" id="program">
-          <option value="natur" selected>Natur</option>
-          <option value="sam">Samhäll</option>
-          <option value="ek">Ekonomi</option>
-          <option value="estet">Estet</option>
-          <option value="teknik">Teknik</option>
-          <option value="el">El och energi</option>
-          <option value="naturbruk">Naturbruk</option>
-          <option value="barn och">Barn och fritid</option>
-          <option value="försäljnings och">Försäljnings och Service</option>
-          <option value="fordon">Fordon och transport</option>
-          <option value="frisör">Frisör och stylist</option>
-          <option value="hu">Humanistiska</option>
-          <option value="bygg">Bygg och anläggning</option>
-          <option value="vård">Vård och omsorg</option>
-          <option value="res">Restaurang och livsmedel</option>
-          <option value="international">International Baccalaureate</option>
-          <option value="vvs och fastighet">VVS och fastighet</option>
-          <option value="hotell">Hotell och turism</option>
-          <option value="introduktion">Introduktion</option>
-          <option value="industritekniska">Industritekniska</option>
-          <option value="sjöfart">Sjöfart</option>
-          <option value="marinteknik">Marinteknik</option>
-          <option value="yrkesdans">Yrkesdans</option>
-          <option value="flygteknik">Flygteknik</option>
-        </select>
-      </div>
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <label for="sortBy" class="form-label">Sortera:</label>
+                <select class="form-select" id="sortBy">
+                    <option value="skola" selected>Namn</option>
+                    <option value="antagningsgräns_prelim">Antagningsgräns Prelim</option>
+                    <option value="antagningsgräns_final">Antagningsgräns Final</option>
+                    <option value="median_prelim">Median Prelim</option>
+                    <option value="median_final">Median Final</option>
+                    <option value="studieväg">Studieväg</option>
+                </select>
+            </div>
 
-      <div class="col-md-6 mb-3">
-        <label for="radius" class="form-label">Radie (km):</label>
-        <input type="number" id="radius" class="form-control">
-      </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label d-block">Sortera:</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="asc" name="SortOrder" value="asc" checked>
+                    <label class="form-check-label" for="asc">Stigande</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="desc" name="SortOrder" value="desc">
+                    <label class="form-check-label" for="desc">Fallande</label>
+                </div>
+            </div>
 
-      <div class="col-md-6 mb-3">
-        <label for="minMerit" class="form-label">Minimum merit:</label>
-        <input type="number" id="minMerit" class="form-control" value="0" min="0" max="335">
-      </div>
+            <div class="col-md-6 mb-3">
+                <label for="program" class="form-label">Studieväg:</label>
+                <select class="form-select" id="program" multiple>
+                    <option value="natur" selected>Natur</option>
+                    <option value="sam">Samhäll</option>
+                    <option value="ek">Ekonomi</option>
+                    <option value="estet">Estet</option>
+                    <option value="teknik">Teknik</option>
+                    <option value="el">El och energi</option>
+                    <option value="naturbruk">Naturbruk</option>
+                    <option value="barn och">Barn och fritid</option>
+                    <option value="försäljnings och">Försäljnings och Service</option>
+                    <option value="fordon">Fordon och transport</option>
+                    <option value="frisör">Frisör och stylist</option>
+                    <option value="hu">Humanistiska</option>
+                    <option value="bygg">Bygg och anläggning</option>
+                    <option value="vård">Vård och omsorg</option>
+                    <option value="res">Restaurang och livsmedel</option>
+                    <option value="international">International Baccalaureate</option>
+                    <option value="vvs och fastighet">VVS och fastighet</option>
+                    <option value="hotell">Hotell och turism</option>
+                    <option value="introduktion">Introduktion</option>
+                    <option value="industritekniska">Industritekniska</option>
+                    <option value="sjöfart">Sjöfart</option>
+                    <option value="marinteknik">Marinteknik</option>
+                    <option value="yrkesdans">Yrkesdans</option>
+                    <option value="flygteknik">Flygteknik</option>
+                </select>
+            </div>
 
-      <div class="col-md-6 mb-3">
-        <label for="maxMerit" class="form-label">Maximal merit:</label>
-        <input type="number" id="maxMerit" class="form-control" value="340" min="0" max="340">
-      </div>
+            <div class="col-md-6 mb-3">
+                <label for="radius" class="form-label">Radie (km):</label>
+                <input type="number" id="radius" class="form-control">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="minPrelimMerit" class="form-label">Preliminär minimum merit:</label>
+                <input type="number" id="minPrelimMerit" class="form-control" value="0" min="0" max="335">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="maxPrelimMerit" class="form-label">Preliminär maximal merit:</label>
+                <input type="number" id="maxPrelimMerit" class="form-control" value="340" min="0" max="340">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="minFinalMerit" class="form-label">Slutlig minimum merit:</label>
+                <input type="number" id="minFinalMerit" class="form-control" value="0" min="0" max="335">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="maxFinalMerit" class="form-label">Slutlig maximal merit:</label>
+                <input type="number" id="maxFinalMerit" class="form-control" value="340" min="0" max="340">
+            </div>
+
+
+        </div>
+
+        <div id="location" class="text-center text-danger mb-4"></div>
+
+        <div id="GymnasiumListData" class="container"></div>
+
     </div>
-
-    <div id="location" class="text-center text-danger mb-4"></div>
-
-    <div id="GymnasiumListData" class="container"></div>
-
-  </div>
 
 </body>
 
