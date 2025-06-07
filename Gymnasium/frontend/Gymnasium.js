@@ -1,8 +1,17 @@
+let currentPage = 0;
+const pageSize = 50;
+let selectedSchools = new Set();
+const MAX_SELECTED_SCHOOLS = 5;
+
 function getLocation(callback) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position) => {
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
+      // Store coordinates for pagination
+      window.lastLatitude = latitude;
+      window.lastLongitude = longitude;
+      window.lastPageNumber = currentPage;
       callback(latitude, longitude);
     }, showError);
   } else {
@@ -11,72 +20,69 @@ function getLocation(callback) {
   }
 }
 
-function getNearestGymnasium(latitude, longitude) {
-  fetch(`${window.CONFIG.API_BASE_URL}/gymnasium`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ latitude, longitude }),
-  })
-    .then((response) =>
-      response.ok ? response.json() : response.text().then(Promise.reject)
-    )
-    .then(renderGymnasiumData)
-    .catch((error) => console.error("Error:", error));
+async function getNearestGymnasium(latitude, longitude) {
+  try {
+    const data = await apiPost(`${window.CONFIG.API_BASE_URL}/gymnasium`, {
+      latitude,
+      longitude,
+    });
+    renderGymnasiumData(data);
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Kunde inte hämta gymnasium: " + error.message);
+  }
 }
 
-function getGymnasiumWithInRadius(latitude, longitude) {
+async function getGymnasiumWithInRadius() {
   const radius = document.getElementById("radius").value;
-  if (radius <= 0 || radius > 8000) {
-    document.getElementById("location").innerHTML =
-      "Enter a valid radius value";
-    return;
-  }
   const sortBy = document.getElementById("sortBy").value;
-  const programOptions = document.getElementById("program").options;
-  console.log(programOptions);
-  const selectedPrograms = [];
-  for (const program of programOptions) {
-    if (program.selected) {
-      selectedPrograms.push(program.value);
-    }
-  }
-  console.log(selectedPrograms);
-  const radios = document.getElementsByName("SortOrder");
-  let selectedSortOrder = "";
-  for (const radio of radios) {
-    if (radio.checked) {
-      selectedSortOrder = radio.value;
-      break;
-    }
-  }
-  const year = document.getElementById("year").value;
+  const sortOrder = document.querySelector(
+    'input[name="SortOrder"]:checked'
+  ).value;
   const minpreMerit = document.getElementById("minPrelimMerit").value;
   const maxpreMerit = document.getElementById("maxPrelimMerit").value;
   const minfinMerit = document.getElementById("minFinalMerit").value;
   const maxfinMerit = document.getElementById("maxFinalMerit").value;
+  const programs = Array.from(
+    document.getElementById("program").selectedOptions
+  ).map((option) => option.value);
+  const year = document.getElementById("year").value;
 
-  fetch(`${window.CONFIG.API_BASE_URL}/gymnasium-within-radius`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      latitude,
-      longitude,
+  try {
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+
+    const data = await apiPost("/api/gymnasium-within-radius", {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
       radius,
       sortBy,
-      sortOrder: selectedSortOrder,
+      sortOrder,
       minpreMerit,
       maxpreMerit,
-      programs: selectedPrograms,
-      year,
       minfinMerit,
       maxfinMerit,
-    }),
-  })
-    .then((response) =>
-      response.ok ? response.json() : response.text().then(Promise.reject)
-    )
-    .then(renderGymnasiumData)
-    .catch((error) => console.error("Error:", error));
+      programs,
+      year,
+    });
+
+    renderGymnasiumData(data.data);
+    updatePagination(data.total, data.page, data.pageSize);
+  } catch (error) {
+    alert("Kunde inte hämta gymnasium: " + error.message);
+  }
+}
+
+function handleGymnasiumResponse(response) {
+  if (!response || !response.data) {
+    renderGymnasiumData([]);
+    renderPagination(0, 0);
+    return;
+  }
+
+  renderGymnasiumData(response.data);
+  renderPagination(response.page, response.totalPages);
 }
 
 function renderGymnasiumData(data) {
@@ -93,7 +99,9 @@ function renderGymnasiumData(data) {
   for (let i = 0; i < data.length; i++) {
     row += `
     <div class="col-md-6 col-lg-4">
-      <div class="card h-100 shadow-sm">
+      <div class="card h-100 shadow-sm" onclick="showSchoolDetails('${
+        data[i].Name
+      }')">
         <div class="card-body">
           <h5 class="card-title">${formatValue(data[i].Name)}</h5>
           <h6 class="card-subtitle mb-2 text-muted">${formatValue(
@@ -146,7 +154,6 @@ function renderGymnasiumData(data) {
                   <td>${formatValue(data[i].Lediga_platser_final)}</td>
                   <td>${formatValue(data[i].Lediga_platser_prelim)}</td>
                 </tr>
-
               </tbody>
             </table>
             <p><strong>Antagningsgräns skillnad:</strong> ${formatValue(
@@ -162,6 +169,61 @@ function renderGymnasiumData(data) {
   }
   row += "</div>";
   listContainer.innerHTML = row;
+}
+
+function renderPagination(currentPage, totalPages) {
+  const paginationContainer = document.getElementById("pagination");
+  if (!paginationContainer) return;
+
+  let paginationHTML = `
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        <li class="page-item ${currentPage === 0 ? "disabled" : ""}">
+          <a class="page-link" href="#" onclick="changePage(${
+            currentPage - 1
+          })" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+  `;
+
+  // Show up to 5 page numbers
+  let startPage = Math.max(0, currentPage - 2);
+  let endPage = Math.min(totalPages - 1, startPage + 4);
+  startPage = Math.max(0, endPage - 4);
+
+  for (let i = startPage; i <= endPage; i++) {
+    paginationHTML += `
+      <li class="page-item ${i === currentPage ? "active" : ""}">
+        <a class="page-link" href="#" onclick="changePage(${i})">${i + 1}</a>
+      </li>
+    `;
+  }
+
+  paginationHTML += `
+        <li class="page-item ${
+          currentPage === totalPages - 1 ? "disabled" : ""
+        }">
+          <a class="page-link" href="#" onclick="changePage(${
+            currentPage + 1
+          })" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  `;
+
+  paginationContainer.innerHTML = paginationHTML;
+}
+
+function changePage(newPage) {
+  currentPage = newPage;
+  window.lastPageNumber = newPage;
+  // Reuse the last used coordinates
+  if (window.lastLatitude && window.lastLongitude) {
+    getGymnasiumWithInRadius();
+  }
 }
 
 function showError(error) {
@@ -181,4 +243,15 @@ function showError(error) {
       break;
   }
   document.getElementById("location").innerHTML = message;
+}
+
+let historicalChart = null;
+
+async function showSchoolDetails(schoolName) {
+  try {
+    const data = await apiGet(`/api/school-details/${schoolName}`);
+    renderSchoolDetails(data);
+  } catch (error) {
+    alert("Kunde inte hämta skoldetaljer: " + error.message);
+  }
 }

@@ -5,16 +5,13 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy the current directory contents into the container
-COPY . /app
-
-# Install dependencies from requirements.txt
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 5005 for the Flask app
-EXPOSE 5005
+COPY . .
 
-# Set the environment variable for Flask
-ENV FLASK_APP=Main.py
+# Expose port 5006 for the fast api app
+EXPOSE 5006
 
-# Run the Flask app using Python
-CMD ["python", "Main.py"]
+# Run the Flask app using Uvicorn
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5006"]

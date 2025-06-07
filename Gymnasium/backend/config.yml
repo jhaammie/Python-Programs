@@ -1,0 +1,7 @@
+JWT_SECRET: "Qw8!zP3@rT7#vL2$kN9^xS6&bM1*eJ4%hG0+uY5"
+JWT_EXPIRATION_DAYS: 1
+DB_USER: postgres
+DB_PASSWORD: XoGvI0vSeqxsQv6
+DB_NAME: gymnasium
+DB_HOST: db
+DB_PORT: 5432
