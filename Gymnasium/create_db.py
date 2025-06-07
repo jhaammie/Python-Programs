@@ -1,9 +1,8 @@
 import psycopg2
-from Hahahaha import PopulateLocation
+# from Hahahaha import PopulateLocation
 from data.DataInsertionScript import insert_data_from_excel
 from dotenv import load_dotenv
 import os
-from 
 
 load_dotenv()
 
@@ -12,10 +11,11 @@ def create_gymnasium_table():
        
         # Connect to the gymnasium database
         connection = psycopg2.connect(
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("USER"),
-            password=os.getenv("PASSWORD"),
-            host=os.getenv("HOST")
+           dbname=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
         )
         cursor = connection.cursor()
 
@@ -43,10 +43,10 @@ def create_gymnasium_table():
         cursor.execute(create_table_query)
         connection.commit()
         print("Table 'gymnasium' created successfully.")
-
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error:
         print(f"Error while working with PostgreSQL: {error}")
-    finally:
         if connection:
             cursor.close()
             connection.close()
@@ -58,9 +58,10 @@ def create_school_table():
         # Connect to the gymnasium database
         connection = psycopg2.connect(
             dbname=os.getenv("DB_NAME"),
-            user=os.getenv("USER"),
-            password=os.getenv("PASSWORD"),
-            host=os.getenv("HOST")
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
         )
         cursor = connection.cursor()
 
@@ -71,17 +72,16 @@ def create_school_table():
             id SERIAL PRIMARY KEY,
             name VARCHAR(50) NOT NULL,
             latitude DOUBLE PRECISION NOT NULL,
-            longitude DOUBLE PRECISION NOT NULL,
-            CONSTRAINT fk_school_name FOREIGN KEY (name) REFERENCES public.gymnasium(skola)
+            longitude DOUBLE PRECISION NOT NULL
         )
         """
         cursor.execute(create_school_table_query)
         connection.commit()
         print("Table 'school' created successfully.")
-
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error:
         print(f"Error while working with PostgreSQL: {error}")
-    finally:
         if connection:
             cursor.close()
             connection.close()
@@ -92,9 +92,10 @@ def add_postgis_extension():
         # Connect to the gymnasium database
         connection = psycopg2.connect(
             dbname=os.getenv("DB_NAME"),
-            user=os.getenv("USER"),
-            password=os.getenv("PASSWORD"),
-            host=os.getenv("HOST")
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
         )
         cursor = connection.cursor()
 
@@ -103,10 +104,10 @@ def add_postgis_extension():
         cursor.execute(add_extension_query)
         connection.commit()
         print("PostGIS extension added successfully.")
-
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error:
         print(f"Error while working with PostgreSQL: {error}")
-    finally:
         if connection:
             cursor.close()
             connection.close()
