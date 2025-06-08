@@ -151,6 +151,12 @@ function getFavoriteSchools() {
 
 // Save user data to localStorage
 async function saveUserData() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Du är inte inloggad. Logga in för att spara dina uppgifter.");
+    return;
+  }
+
   const userData = {
     id: localStorage.getItem("userId"),
     email: localStorage.getItem("userEmail"),
@@ -161,25 +167,11 @@ async function saveUserData() {
   };
 
   try {
-    const response = await fetch("/api/users/me", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to save user data");
-    }
-
-    const updatedUser = await response.json();
+    const updatedUser = await apiPut("/users/me", userData);
     localStorage.setItem("userEmail", updatedUser.email);
     localStorage.setItem("userFirstName", updatedUser.first_name);
     localStorage.setItem("userLastName", updatedUser.last_name);
 
-    // Show success message
     alert("Dina uppgifter har sparats!");
   } catch (error) {
     console.error("Error saving user data:", error);

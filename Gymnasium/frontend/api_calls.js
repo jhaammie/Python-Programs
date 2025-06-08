@@ -85,3 +85,28 @@ function handleAuthExpiry() {
     alert("Din session har gått ut. Vänligen logga in igen.");
   }
 }
+
+async function apiPut(endpoint, data) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(`/api${endpoint}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      errorText || "Ett fel uppstod vid kommunikation med servern."
+    );
+  }
+
+  return response.json();
+}
