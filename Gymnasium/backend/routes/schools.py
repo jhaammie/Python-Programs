@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
-from hoohoohee import GetSchoolById, GetSchoolsInRadius, GetSchoolPredictions
+from hoohoohee import GetSchoolById, GetSchoolsInRadius, GetSchoolPredictions, GetSchoolHistoricalData, GetSchoolLocation, GetGymnasiumWithinRadius, GetDataForSchools, PredictSchoolsWithinRadius
 from .auth import get_current_user
 
 router = APIRouter()
@@ -27,6 +27,13 @@ class SchoolBase(BaseModel):
     Lediga_platser_final: int
     grans_diff: float
     median_diff: float
+
+class PaginatedResponse(BaseModel):
+    data: List[SchoolBase]
+    total: int
+    page: int
+    pageSize: int
+    totalPages: int
 
 class SchoolLocation(BaseModel):
     latitude: float
@@ -96,7 +103,7 @@ async def get_school_details(school_name: str, current_user: int = Depends(get_c
         }
     }
 
-@router.post("/schools/nearby", response_model=List[SchoolBase])
+@router.post("/schools/nearby", response_model=PaginatedResponse)
 async def get_nearby_schools(
     location: LocationRequest,
     current_user: int = Depends(get_current_user)
@@ -148,7 +155,13 @@ async def get_nearby_schools(
         }
         result.append(d)
     
-    return result
+    return {
+        "data": result,
+        "total": total_count,
+        "page": location.page,
+        "pageSize": location.pageSize,
+        "totalPages": (total_count + location.pageSize - 1) // location.pageSize
+    }
 
 @router.post("/schools/predictions", response_model=List[SchoolPrediction])
 async def get_school_predictions(
