@@ -8,13 +8,12 @@ import psycopg2
 # ============= Database Configuration =============
 with open('config.yml', 'r') as f:
     config = yaml.safe_load(f)
-    db_config = config.get('database', {})
 
-DB_USER = db_config.get('DB_USER', 'postgres')
-DB_PASSWORD = db_config.get('DB_PASSWORD', '')
-DB_NAME = db_config.get('DB_NAME', 'gymnasium')
-DB_HOST = db_config.get('DB_HOST', 'localhost')
-DB_PORT = db_config.get('DB_PORT', '5432')
+DB_USER = config.get('DB_USER', 'postgres')
+DB_PASSWORD = config.get('DB_PASSWORD', '')
+DB_NAME = config.get('DB_NAME', 'gymnasium')
+DB_HOST = config.get('DB_HOST', 'db')
+DB_PORT = config.get('DB_PORT', '5432')
 
 # ============= Database Connection =============
 def get_db_connection():
