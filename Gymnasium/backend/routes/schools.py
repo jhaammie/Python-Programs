@@ -193,10 +193,10 @@ async def get_regression_predictions(location: PredictionRequest):
             final_scores = []
             program_codes = []
             for row in historical_data:
-                if row[6] is not None and row[7] is not None:  # Check for None values
-                    prelim_scores.append(row[6])  # Antagningsgrans_prelim
-                    final_scores.append(row[7])   # Antagningsgrans_final
-                    program_codes.append(row[4])  # Studievagskod
+                if row[2] is not None and row[3] is not None:  # Check for None values in prelim and final scores
+                    prelim_scores.append(row[2])  # antagningsgräns_prelim
+                    final_scores.append(row[3])   # antagningsgräns_final
+                    program_codes.append(row[16])  # studievägskod
             
             if len(prelim_scores) > 1:  # Need at least 2 valid points for regression
                 # Create feature matrix with prelim scores and program codes
@@ -212,7 +212,7 @@ async def get_regression_predictions(location: PredictionRequest):
                     model.fit(X, y)
                     
                     # Predict final score using both prelim score and program code
-                    current_program_code = historical_data[0][4]  # Use most recent program code
+                    current_program_code = historical_data[0][16]  # Use most recent program code
                     predicted_final = model.predict([[
                         location.prelim_score,
                         current_program_code
@@ -221,27 +221,32 @@ async def get_regression_predictions(location: PredictionRequest):
                     # Get school location
                     school_location = GetSchoolLocation(school_name)
                     if school_location:
+                        # Calculate median difference
+                        median_prelim = historical_data[0][4]  # median_prelim
+                        median_final = historical_data[0][5]   # median_final
+                        median_diff = median_final - median_prelim if median_prelim is not None and median_final is not None else None
+                        
                         predictions.append({
-                            "Year": historical_data[0][0],  # Use most recent year
-                            "Kommun": historical_data[0][1],
+                            "Year": historical_data[0][0],  # år
+                            "Kommun": historical_data[0][15],  # kommun
                             "Name": school_name,
-                            "Organisitionsform": historical_data[0][3],
-                            "Studievagskod": historical_data[0][4],
-                            "Studievag": historical_data[0][5],
+                            "Organisitionsform": historical_data[0][14],  # organistionsform
+                            "Studievagskod": historical_data[0][16],  # studievägskod
+                            "Studievag": historical_data[0][1],  # studieväg
                             "Antagningsgrans_prelim": location.prelim_score,
                             "Antagningsgrans_final": predicted_final,
-                            "Median_prelim": historical_data[0][8],
-                            "Median_final": historical_data[0][9],
-                            "Antal_platser_prelim": historical_data[0][10],
-                            "Antal_platser_final": historical_data[0][11],
-                            "Antagna_prelim": historical_data[0][12],
-                            "Antagna_final": historical_data[0][13],
-                            "Reserver_prelim": historical_data[0][14],
-                            "Reserver_final": historical_data[0][15],
-                            "Lediga_platser_prelim": historical_data[0][16],
-                            "Lediga_platser_final": historical_data[0][17],
+                            "Median_prelim": median_prelim,
+                            "Median_final": median_final,
+                            "Antal_platser_prelim": historical_data[0][6],  # antal_platser_prelim
+                            "Antal_platser_final": historical_data[0][7],   # antal_platser_final
+                            "Antagna_prelim": historical_data[0][8],        # antagna_prelim
+                            "Antagna_final": historical_data[0][9],         # antagna_final
+                            "Reserver_prelim": historical_data[0][10],      # reserver_prelim
+                            "Reserver_final": historical_data[0][11],       # reserver_final
+                            "Lediga_platser_prelim": historical_data[0][12], # lediga_platser_prelim
+                            "Lediga_platser_final": historical_data[0][13],  # lediga_platser_final
                             "grans_diff": predicted_final - location.prelim_score,
-                            "median_diff": historical_data[0][19],
+                            "median_diff": median_diff,
                             "latitude": school_location[0],
                             "longitude": school_location[1],
                             "distance": round(school[1], 1)  # Distance is already calculated by GetGymnasiumWithinRadius
