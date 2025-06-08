@@ -89,7 +89,8 @@ function renderGymnasiumData(data) {
   const listContainer = document.getElementById("GymnasiumListData");
   listContainer.innerHTML = ""; // Clear previous content
   if (!data || data.length === 0) {
-    listContainer.innerHTML = "<p class='text-center'>No gymnasium found</p>";
+    listContainer.innerHTML =
+      "<p class='text-center'>Inga gymnasieskolor hittades</p>";
     return;
   }
 
@@ -119,8 +120,8 @@ function renderGymnasiumData(data) {
               <thead class="table-light">
                 <tr>
                   <th>Uppgift</th>
-                  <th>Final</th>
-                  <th>Prelim</th>
+                  <th>Slutlig</th>
+                  <th>Preliminär</th>
                 </tr>
               </thead>
               <tbody>
@@ -139,29 +140,8 @@ function renderGymnasiumData(data) {
                   <td>${formatValue(data[i].Antal_platser_final)}</td>
                   <td>${formatValue(data[i].Antal_platser_prelim)}</td>
                 </tr>
-                <tr>
-                  <td>Antagna</td>
-                  <td>${formatValue(data[i].Antagna_final)}</td>
-                  <td>${formatValue(data[i].Antagna_prelim)}</td>
-                </tr>
-                <tr>
-                  <td>Reserver</td>
-                  <td>${formatValue(data[i].Reserver_final)}</td>
-                  <td>${formatValue(data[i].Reserver_prelim)}</td>
-                </tr>
-                <tr>
-                  <td>Lediga platser</td>
-                  <td>${formatValue(data[i].Lediga_platser_final)}</td>
-                  <td>${formatValue(data[i].Lediga_platser_prelim)}</td>
-                </tr>
               </tbody>
             </table>
-            <p><strong>Antagningsgräns skillnad:</strong> ${formatValue(
-              data[i].grans_diff
-            )}</p>
-            <p><strong>Median skillnad:</strong> ${formatValue(
-              data[i].median_diff
-            )}</p>
           </div>
         </div>
       </div>
@@ -249,9 +229,136 @@ let historicalChart = null;
 
 async function showSchoolDetails(schoolName) {
   try {
-    const data = await apiGet(`/api/school-details/${schoolName}`);
-    renderSchoolDetails(data);
+    const response = await apiPost("/api/schools", {
+      school_name: schoolName,
+    });
+
+    const modal = document.getElementById("schoolDetailsModal");
+    const modalBody = modal.querySelector(".modal-body");
+
+    // Create content for the modal
+    let content = `
+      <div class="mb-4">
+        <h5>Skolinformation</h5>
+        <p><strong>Skola:</strong> ${response.historical_data[0].Name}</p>
+        <p><strong>Kommun:</strong> ${response.historical_data[0].Kommun}</p>
+        ${
+          response.location.latitude
+            ? `
+          <p><strong>Plats:</strong> ${response.location.latitude.toFixed(
+            6
+          )}, ${response.location.longitude.toFixed(6)}</p>
+        `
+            : ""
+        }
+      </div>
+      <div class="table-responsive">
+        <h5>Historisk data</h5>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>År</th>
+              <th>Studieväg</th>
+              <th>Preliminär merit</th>
+              <th>Slutlig merit</th>
+              <th>Median preliminär</th>
+              <th>Median slutlig</th>
+              <th>Antal platser</th>
+              <th>Antagna</th>
+              <th>Reserver</th>
+              <th>Lediga platser</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    response.historical_data.forEach((data) => {
+      content += `
+        <tr>
+          <td>${data.Year}</td>
+          <td>${data.Studievag}</td>
+          <td>${
+            data.Antagningsgrans_prelim?.toFixed(1) || "Ej tillgänglig"
+          }</td>
+          <td>${data.Antagningsgrans_final?.toFixed(1) || "Ej tillgänglig"}</td>
+          <td>${data.Median_prelim?.toFixed(1) || "Ej tillgänglig"}</td>
+          <td>${data.Median_final?.toFixed(1) || "Ej tillgänglig"}</td>
+          <td>${data.Antal_platser_prelim || "Ej tillgänglig"}</td>
+          <td>${data.Antagna_prelim || "Ej tillgänglig"}</td>
+          <td>${data.Reserver_prelim || "Ej tillgänglig"}</td>
+          <td>${data.Lediga_platser_prelim || "Ej tillgänglig"}</td>
+        </tr>
+      `;
+    });
+
+    content += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    modalBody.innerHTML = content;
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
   } catch (error) {
+    console.error("Fel vid hämtning av skoldetaljer:", error);
     alert("Kunde inte hämta skoldetaljer: " + error.message);
   }
+}
+
+function updatePagination(total, currentPage, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  const paginationContainer = document.getElementById("pagination");
+  paginationContainer.innerHTML = "";
+
+  if (totalPages <= 1) return;
+
+  // Create pagination controls
+  const ul = document.createElement("ul");
+  ul.className = "pagination justify-content-center";
+
+  // Previous button
+  const prevLi = document.createElement("li");
+  prevLi.className = `page-item ${currentPage === 0 ? "disabled" : ""}`;
+  prevLi.innerHTML = `
+        <a class="page-link" href="#" onclick="changePage(${
+          currentPage - 1
+        })" ${currentPage === 0 ? 'tabindex="-1" aria-disabled="true"' : ""}>
+            Föregående
+        </a>
+    `;
+  ul.appendChild(prevLi);
+
+  // Page numbers
+  const startPage = Math.max(0, currentPage - 2);
+  const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+  for (let i = startPage; i <= endPage; i++) {
+    const li = document.createElement("li");
+    li.className = `page-item ${i === currentPage ? "active" : ""}`;
+    li.innerHTML = `
+            <a class="page-link" href="#" onclick="changePage(${i})">
+                ${i + 1}
+            </a>
+        `;
+    ul.appendChild(li);
+  }
+
+  // Next button
+  const nextLi = document.createElement("li");
+  nextLi.className = `page-item ${
+    currentPage === totalPages - 1 ? "disabled" : ""
+  }`;
+  nextLi.innerHTML = `
+        <a class="page-link" href="#" onclick="changePage(${
+          currentPage + 1
+        })" ${
+    currentPage === totalPages - 1 ? 'tabindex="-1" aria-disabled="true"' : ""
+  }>
+            Nästa
+        </a>
+    `;
+  ul.appendChild(nextLi);
+
+  paginationContainer.appendChild(ul);
 }

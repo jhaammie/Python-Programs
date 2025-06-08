@@ -71,10 +71,13 @@ class PredictionRequest(BaseModel):
     radius: int = Field(ge=1, le=20)
     prelim_score: float
 
-@router.get("/schools/{school_name}", response_model=SchoolDetails)
-async def get_school_details(school_name: str):
-    historical_data = GetSchoolHistoricalData(school_name)
-    location = GetSchoolLocation(school_name)
+class SchoolNameRequest(BaseModel):
+    school_name: str
+
+@router.get("/schools", response_model=SchoolDetails)
+async def get_school_details(request: SchoolNameRequest):
+    historical_data = GetSchoolHistoricalData(request.school_name)
+    location = GetSchoolLocation(request.school_name)
     
     formatted_data = []
     for row in historical_data:
