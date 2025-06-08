@@ -56,20 +56,23 @@ async function getGymnasiumWithInRadius() {
     const data = await apiPost("/api/gymnasium-within-radius", {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
-      radius,
-      sortBy,
-      sortOrder,
-      minpreMerit,
-      maxpreMerit,
-      minfinMerit,
-      maxfinMerit,
-      programs,
-      year,
+      radius: radius,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      minpreMerit: minpreMerit,
+      maxpreMerit: maxpreMerit,
+      minfinMerit: minfinMerit,
+      maxfinMerit: maxfinMerit,
+      programs: programs,
+      year: year,
+      page: currentPage,
+      pageSize: pageSize,
     });
 
     renderGymnasiumData(data.data);
     updatePagination(data.total, data.page, data.pageSize);
   } catch (error) {
+    console.error("Fel vid hämtning av gymnasium:", error);
     alert("Kunde inte hämta gymnasium: " + error.message);
   }
 }
