@@ -85,19 +85,26 @@ function displayPredictions(predictions) {
     const card = document.createElement("div");
     card.className = "card h-100";
 
+    // Calculate probability based on prelim score and final score
+    const probability =
+      pred.Antagningsgrans_prelim >= pred.Antagningsgrans_final ? 100 : 0;
+
+    // Calculate confidence based on available data
+    const confidence = pred.Antal_platser_prelim > 0 ? 100 : 0;
+
     // Calculate confidence level color
     let confidenceColor = "text-danger";
-    if (pred.confidence >= 70) {
+    if (confidence >= 70) {
       confidenceColor = "text-success";
-    } else if (pred.confidence >= 40) {
+    } else if (confidence >= 40) {
       confidenceColor = "text-warning";
     }
 
     // Calculate probability color
     let probabilityColor = "text-danger";
-    if (pred.probability >= 70) {
+    if (probability >= 70) {
       probabilityColor = "text-success";
-    } else if (pred.probability >= 40) {
+    } else if (probability >= 40) {
       probabilityColor = "text-warning";
     }
 
@@ -113,20 +120,16 @@ function displayPredictions(predictions) {
           <strong>Predikterad final merit:</strong> ${
             pred.Antagningsgrans_final?.toFixed(1) || "N/A"
           }<br>
-          <strong>Chans att komma in:</strong> <span class="${probabilityColor}">${
-      pred.probability?.toFixed(1) || "N/A"
-    }%</span><br>
-          <strong>Tillförlitlighet:</strong> <span class="${confidenceColor}">${
-      pred.confidence?.toFixed(1) || "N/A"
-    }%</span><br>
+          <strong>Chans att komma in:</strong> <span class="${probabilityColor}">${probability}%</span><br>
+          <strong>Tillförlitlighet:</strong> <span class="${confidenceColor}">${confidence}%</span><br>
           <strong>Avstånd:</strong> ${pred.distance?.toFixed(1) || "N/A"} km
         </p>
       </div>
       <div class="card-footer">
         <small class="text-muted">
-          Antal platser: ${pred.Antal_platser_final || "N/A"} | 
-          Antagna: ${pred.Antagna_final || "N/A"} | 
-          Lediga: ${pred.Lediga_platser_final || "N/A"}
+          Antal platser: ${pred.Antal_platser_prelim || "N/A"} | 
+          Antagna: ${pred.Antagna_prelim || "N/A"} | 
+          Lediga: ${pred.Lediga_platser_prelim || "N/A"}
         </small>
       </div>
     `;
