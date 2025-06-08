@@ -1,3 +1,11 @@
+// Format value to one decimal place or return 'NA' if null/undefined
+function formatValue(value) {
+  if (value === null || value === undefined) {
+    return "NA";
+  }
+  return Number(value).toFixed(1);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   // Get school name from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,7 +32,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Update Google Maps link
     const locationLink = document.getElementById("locationLink");
-    locationLink.href = `https://www.google.com/maps?q=${school.latitude},${school.longitude}`;
+    if (school.Latitude && school.Longitude) {
+      locationLink.href = `https://www.google.com/maps?q=${school.Latitude},${school.Longitude}`;
+    } else {
+      locationLink.style.display = "none";
+    }
 
     // Populate historical data table
     const historicalData = document.getElementById("historicalData");
