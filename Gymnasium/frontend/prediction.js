@@ -10,12 +10,19 @@ async function getPredictions(event) {
   }
 
   try {
-    const data = await apiPost("/api/predict-schools-within-radius", {
-      prelimScore,
-      radius,
-      year,
+    // Get user's location
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
     });
-    renderPredictions(data.predictions);
+
+    const data = await apiPost("/api/schools/predictions/regression", {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      radius: parseInt(radius),
+      prelim_score: parseFloat(prelimScore),
+    });
+
+    renderPredictions(data);
   } catch (error) {
     alert("Kunde inte hämta förutsägelser: " + error.message);
   }
@@ -41,4 +48,47 @@ function getConfidenceLevel(scoreDiff, availablePlaces) {
   } else {
     return { level: "low", text: "Mycket låg - Osannolikt att bli antagen" };
   }
+}
+
+function renderPredictions(predictions) {
+  const container = document.getElementById("predictionsContainer");
+  container.innerHTML = "";
+
+  if (!predictions || predictions.length === 0) {
+    container.innerHTML =
+      "<p class='text-center'>Inga skolor hittades inom det angivna avståndet</p>";
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.className = "table table-striped";
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Skola</th>
+        <th>Kommun</th>
+        <th>Studieväg</th>
+        <th>Prelim merit</th>
+        <th>Predikterad final merit</th>
+        <th>Avstånd (km)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+  const tbody = table.querySelector("tbody");
+  predictions.forEach((pred) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${pred.Name}</td>
+      <td>${pred.Kommun}</td>
+      <td>${pred.Studievag}</td>
+      <td>${pred.Antagningsgrans_prelim}</td>
+      <td>${pred.Antagningsgrans_final.toFixed(1)}</td>
+      <td>${pred.distance}</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  container.appendChild(table);
 }

@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from hoohoohee import GetSchoolHistoricalData, GetSchoolLocation, GetGymnasiumWithinRadius, GetDataForSchools, PredictSchoolsWithinRadius
 from .auth import get_current_user
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 router = APIRouter()
 
@@ -53,7 +55,6 @@ class LocationRequest(BaseModel):
     longitude: float
     radius: float
     year: int
-    prelim_score: float
     sortBy: Optional[str] = None
     sortOrder: Optional[str] = None
     minpreMerit: Optional[float] = None
@@ -63,6 +64,12 @@ class LocationRequest(BaseModel):
     programs: Optional[List[str]] = None
     page: Optional[int] = 0
     pageSize: Optional[int] = 50
+
+class PredictionRequest(BaseModel):
+    latitude: float
+    longitude: float
+    radius: int = Field(ge=1, le=20)
+    prelim_score: float
 
 @router.get("/schools/{school_name}", response_model=SchoolDetails)
 async def get_school_details(school_name: str):
@@ -160,46 +167,66 @@ async def get_nearby_schools(location: LocationRequest):
         "totalPages": (total_count + location.pageSize - 1) // location.pageSize
     }
 
-@router.post("/schools/predictions", response_model=List[SchoolPrediction])
-async def get_school_predictions(
-    location: LocationRequest,
-    current_user: int = Depends(get_current_user)
-):
-    predictions = PredictSchoolsWithinRadius(
-        location.prelim_score,
+@router.post("/schools/predictions/regression", response_model=List[SchoolPrediction])
+async def get_regression_predictions(location: PredictionRequest):
+    # First get schools within radius
+    schools, _ = GetGymnasiumWithinRadius(
         location.latitude,
         location.longitude,
         location.radius,
-        location.year
+        0,  # page
+        1000  # large page size to get all schools
     )
     
-    formatted_predictions = []
-    for pred in predictions:
-        d = {
-            "Year": pred[0],
-            "Kommun": pred[1],
-            "Name": pred[2],
-            "Organisitionsform": pred[3],
-            "Studievagskod": pred[4],
-            "Studievag": pred[5],
-            "Antagningsgrans_prelim": pred[6],
-            "Antagningsgrans_final": pred[7],
-            "Median_prelim": pred[8],
-            "Median_final": pred[9],
-            "Antal_platser_prelim": pred[10],
-            "Antal_platser_final": pred[11],
-            "Antagna_prelim": pred[12],
-            "Antagna_final": pred[13],
-            "Reserver_prelim": pred[14],
-            "Reserver_final": pred[15],
-            "Lediga_platser_prelim": pred[16],
-            "Lediga_platser_final": pred[17],
-            "grans_diff": pred[18],
-            "median_diff": pred[19],
-            "latitude": pred[20],
-            "longitude": pred[21],
-            "distance": round(pred[22], 1)
-        }
-        formatted_predictions.append(d)
+    predictions = []
+    for school in schools:
+        school_name = school[0]
+        # Get historical data for this specific school
+        historical_data = GetSchoolHistoricalData(school_name)
+        
+        if len(historical_data) > 1:  # Need at least 2 points for regression
+            # Extract prelim and final scores
+            prelim_scores = [row[6] for row in historical_data]  # Antagningsgrans_prelim
+            final_scores = [row[7] for row in historical_data]   # Antagningsgrans_final
+            
+            # Fit regression model
+            X = np.array(prelim_scores).reshape(-1, 1)
+            y = np.array(final_scores)
+            model = LinearRegression()
+            model.fit(X, y)
+            
+            # Predict final score
+            predicted_final = model.predict([[location.prelim_score]])[0]
+            
+            # Get school location
+            school_location = GetSchoolLocation(school_name)
+            if school_location:
+                predictions.append({
+                    "Year": historical_data[0][0],  # Use most recent year
+                    "Kommun": historical_data[0][1],
+                    "Name": school_name,
+                    "Organisitionsform": historical_data[0][3],
+                    "Studievagskod": historical_data[0][4],
+                    "Studievag": historical_data[0][5],
+                    "Antagningsgrans_prelim": location.prelim_score,
+                    "Antagningsgrans_final": predicted_final,
+                    "Median_prelim": historical_data[0][8],
+                    "Median_final": historical_data[0][9],
+                    "Antal_platser_prelim": historical_data[0][10],
+                    "Antal_platser_final": historical_data[0][11],
+                    "Antagna_prelim": historical_data[0][12],
+                    "Antagna_final": historical_data[0][13],
+                    "Reserver_prelim": historical_data[0][14],
+                    "Reserver_final": historical_data[0][15],
+                    "Lediga_platser_prelim": historical_data[0][16],
+                    "Lediga_platser_final": historical_data[0][17],
+                    "grans_diff": predicted_final - location.prelim_score,
+                    "median_diff": historical_data[0][19],
+                    "latitude": school_location[0],
+                    "longitude": school_location[1],
+                    "distance": round(school[1], 1)  # Distance is already calculated by GetGymnasiumWithinRadius
+                })
     
-    return formatted_predictions 
+    # Sort by distance
+    predictions.sort(key=lambda x: x["distance"])
+    return predictions

@@ -389,7 +389,7 @@ def PredictSchools(prelim_score, year=None):
         print(error)
     return data
 
-def PredictSchoolsWithinRadius(prelim_score, latitude, longitude, radius, year=None):
+def PredictSchoolsWithinRadius(prelim_score, latitude, longitude, radius):
     """Predict suitable schools within radius based on prelim score."""
     data = []
     try:
@@ -431,10 +431,6 @@ def PredictSchoolsWithinRadius(prelim_score, latitude, longitude, radius, year=N
                 ) / 1000 <= %s
         """
         params = [longitude, latitude, prelim_score, longitude, latitude, radius]
-        
-        if year:
-            query += " AND p.år = %s"
-            params.append(year)
             
         query += """
             )
