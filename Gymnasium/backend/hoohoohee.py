@@ -321,7 +321,7 @@ def GetSchoolHistoricalData(school_name):
                 organistionsform,
                 kommun, 
                 studievägskod,
-                grans_diff,
+                gräns_diff,
                 median_diff
             FROM prelim_final_gymnasium 
             WHERE skola = %s
