@@ -325,8 +325,13 @@ async function fetchSchoolDetails() {
       program.data.sort((a, b) => a.Year - b.Year);
     });
 
-    // Create charts for each program
-    Object.values(programData).forEach((program) => {
+    // Convert to array and sort by program name
+    const sortedPrograms = Object.values(programData).sort((a, b) =>
+      a.name.localeCompare(b.name, "sv")
+    );
+
+    // Create charts for each program in sorted order
+    sortedPrograms.forEach((program) => {
       createProgramCharts(program.data, program.code, program.name);
     });
   } catch (error) {
