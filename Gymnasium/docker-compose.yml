@@ -8,6 +8,8 @@ services:
     container_name: backend_app
     volumes:
       - ./backend:/app
+      - /app/venv
+      - /usr/local/lib/python3.11/site-packages
     depends_on:
       - db
     restart: always
