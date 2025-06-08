@@ -3,3 +3,4 @@ venv
 Gymnasium/.DS_Store
 .DS_Store
 Gymnasium/backend/__pycache__
+Gymnasium/backend/routes/__pycache__

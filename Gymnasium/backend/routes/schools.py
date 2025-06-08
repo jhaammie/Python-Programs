@@ -65,7 +65,7 @@ class LocationRequest(BaseModel):
     pageSize: Optional[int] = 50
 
 @router.get("/schools/{school_name}", response_model=SchoolDetails)
-async def get_school_details(school_name: str, current_user: int = Depends(get_current_user)):
+async def get_school_details(school_name: str):
     historical_data = GetSchoolHistoricalData(school_name)
     location = GetSchoolLocation(school_name)
     
@@ -104,10 +104,7 @@ async def get_school_details(school_name: str, current_user: int = Depends(get_c
     }
 
 @router.post("/schools/nearby", response_model=PaginatedResponse)
-async def get_nearby_schools(
-    location: LocationRequest,
-    current_user: int = Depends(get_current_user)
-):
+async def get_nearby_schools(location: LocationRequest):
     schools, total_count = GetGymnasiumWithinRadius(
         location.latitude,
         location.longitude,

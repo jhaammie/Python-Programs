@@ -49,7 +49,7 @@ async def update_user_info(
         raise HTTPException(status_code=404, detail="User not found")
     
     # Update user
-    updated_at = datetime.utcnow()
+    updated_at = datetime.now(datetime.UTC)
     success = UpdateUser(
         str(current_user),
         user_update.email or user[1],

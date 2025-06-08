@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import jwt
 import bcrypt
 import yaml
-from typing import Optional
+from typing import Optional, Tuple
 from uuid import UUID, uuid4
 from hoohoohee import CreateUser, GetUserByEmail
 
@@ -45,8 +45,8 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     user_id: Optional[UUID] = None
 
-def create_access_token(user_id: UUID) -> tuple[str, datetime]:
-    expires_at = datetime.utcnow() + JWT_EXPIRATION
+def create_access_token(user_id: UUID) -> Tuple[str, datetime]:
+    expires_at = datetime.now(datetime.UTC) + JWT_EXPIRATION
     payload = {
         'user_id': str(user_id),
         'exp': expires_at
@@ -75,7 +75,7 @@ async def register(user: UserCreate):
     
     # Create user with UUID
     user_id = uuid4()
-    created_at = datetime.utcnow()
+    created_at = datetime.now(datetime.UTC)
     CreateUser(str(user_id), user.email, hashed_password.decode('utf-8'), user.first_name, user.last_name, created_at)
     
     # Generate token
