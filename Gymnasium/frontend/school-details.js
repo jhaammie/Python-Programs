@@ -47,7 +47,7 @@ function createProgramCharts(programData, programCode, programName) {
       datasets: [
         {
           label: "Preliminär merit",
-          data: programData.map((d) => d.PreliminaryMerit),
+          data: programData.map((d) => d.PreliminaryMerit ?? 0),
           borderColor: "#4e73df",
           backgroundColor: "rgba(78, 115, 223, 0.1)",
           borderWidth: 2,
@@ -55,7 +55,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Preliminär median",
-          data: programData.map((d) => d.PreliminaryMedian),
+          data: programData.map((d) => d.PreliminaryMedian ?? 0),
           borderColor: "#4e73df",
           backgroundColor: "rgba(78, 115, 223, 0.1)",
           borderWidth: 2,
@@ -64,7 +64,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Slutlig merit",
-          data: programData.map((d) => d.FinalMerit),
+          data: programData.map((d) => d.FinalMerit ?? 0),
           borderColor: "#1cc88a",
           backgroundColor: "rgba(28, 200, 138, 0.1)",
           borderWidth: 2,
@@ -72,7 +72,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Slutlig median",
-          data: programData.map((d) => d.FinalMedian),
+          data: programData.map((d) => d.FinalMedian ?? 0),
           borderColor: "#1cc88a",
           backgroundColor: "rgba(28, 200, 138, 0.1)",
           borderWidth: 2,
@@ -117,7 +117,7 @@ function createProgramCharts(programData, programCode, programName) {
       datasets: [
         {
           label: "Antal platser preliminär",
-          data: programData.map((d) => d.Antal_platser_prelim),
+          data: programData.map((d) => d.Antal_platser_prelim ?? 0),
           borderColor: "#4e73df",
           backgroundColor: "rgba(78, 115, 223, 0.1)",
           borderWidth: 2,
@@ -125,7 +125,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Antal platser slutlig",
-          data: programData.map((d) => d.Antal_platser_final),
+          data: programData.map((d) => d.Antal_platser_final ?? 0),
           borderColor: "#4e73df",
           backgroundColor: "rgba(78, 115, 223, 0.1)",
           borderWidth: 2,
@@ -134,7 +134,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Antagna preliminär",
-          data: programData.map((d) => d.Antagna_prelim),
+          data: programData.map((d) => d.Antagna_prelim ?? 0),
           borderColor: "#1cc88a",
           backgroundColor: "rgba(28, 200, 138, 0.1)",
           borderWidth: 2,
@@ -142,7 +142,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Antagna slutlig",
-          data: programData.map((d) => d.Antagna_final),
+          data: programData.map((d) => d.Antagna_final ?? 0),
           borderColor: "#1cc88a",
           backgroundColor: "rgba(28, 200, 138, 0.1)",
           borderWidth: 2,
@@ -151,7 +151,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Reserver preliminär",
-          data: programData.map((d) => d.Reserver_prelim),
+          data: programData.map((d) => d.Reserver_prelim ?? 0),
           borderColor: "#f6c23e",
           backgroundColor: "rgba(246, 194, 62, 0.1)",
           borderWidth: 2,
@@ -159,7 +159,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Reserver slutlig",
-          data: programData.map((d) => d.Reserver_final),
+          data: programData.map((d) => d.Reserver_final ?? 0),
           borderColor: "#f6c23e",
           backgroundColor: "rgba(246, 194, 62, 0.1)",
           borderWidth: 2,
@@ -168,7 +168,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Lediga platser preliminär",
-          data: programData.map((d) => d.Lediga_platser_prelim),
+          data: programData.map((d) => d.Lediga_platser_prelim ?? 0),
           borderColor: "#e74a3b",
           backgroundColor: "rgba(231, 74, 59, 0.1)",
           borderWidth: 2,
@@ -176,7 +176,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Lediga platser slutlig",
-          data: programData.map((d) => d.Lediga_platser_final),
+          data: programData.map((d) => d.Lediga_platser_final ?? 0),
           borderColor: "#e74a3b",
           backgroundColor: "rgba(231, 74, 59, 0.1)",
           borderWidth: 2,
