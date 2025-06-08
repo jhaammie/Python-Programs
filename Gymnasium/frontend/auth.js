@@ -143,26 +143,49 @@ async function loadUserData() {
   }
 }
 
-// Save user data
-async function saveUserData() {
-  if (!authToken) return;
+// Get favorite schools from localStorage
+function getFavoriteSchools() {
+  const favorites = localStorage.getItem("favoriteSchools");
+  return favorites ? JSON.parse(favorites) : [];
+}
 
-  const prelimScore = document.getElementById("prelimScore")?.value;
-  const favoriteSchools = getFavoriteSchools();
+// Save user data to localStorage
+async function saveUserData() {
+  const userData = {
+    id: localStorage.getItem("userId"),
+    email: localStorage.getItem("userEmail"),
+    first_name: localStorage.getItem("userFirstName"),
+    last_name: localStorage.getItem("userLastName"),
+    prelim_score: localStorage.getItem("userPrelimScore"),
+    favorite_schools: getFavoriteSchools(),
+  };
 
   try {
-    await apiPost("/api/users/me", {
-      prelim_score: prelimScore,
-      favorite_schools: favoriteSchools,
+    const response = await fetch("/api/users/me", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(userData),
     });
 
-    alert("Dina uppgifter har sparats");
-  } catch (error) {
-    if (error.message.includes("session")) {
-      // Session expired, UI will be updated by handleAuthExpiry
-      return;
+    if (!response.ok) {
+      throw new Error("Failed to save user data");
     }
-    alert("Kunde inte spara dina uppgifter: " + error.message);
+
+    const updatedUser = await response.json();
+    localStorage.setItem("userEmail", updatedUser.email);
+    localStorage.setItem("userFirstName", updatedUser.first_name);
+    localStorage.setItem("userLastName", updatedUser.last_name);
+
+    // Show success message
+    alert("Dina uppgifter har sparats!");
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    alert(
+      "Ett fel uppstod när dina uppgifter skulle sparas. Försök igen senare."
+    );
   }
 }
 
