@@ -123,7 +123,7 @@ async function loadUserData() {
   if (!authToken) return;
 
   try {
-    const data = await apiGet(`${window.CONFIG.API_BASE_URL}/api/users/me`);
+    const data = await apiGet(`${window.CONFIG.API_BASE_URL}/users/me`);
     currentUser = data;
 
     if (data.prelim_score) {
