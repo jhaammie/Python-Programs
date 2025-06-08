@@ -214,10 +214,10 @@ function createProgramCharts(programData, programCode, programName) {
 // Fetch and display school details
 async function fetchSchoolDetails() {
   const urlParams = new URLSearchParams(window.location.search);
-  const schoolId = urlParams.get("id");
+  const schoolName = urlParams.get("school");
 
-  if (!schoolId) {
-    alert("Inget skol-ID angivet");
+  if (!schoolName) {
+    alert("Inget skola angivet");
     return;
   }
 
