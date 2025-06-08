@@ -199,8 +199,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Update Google Maps link
     const locationLink = document.getElementById("locationLink");
-    if (school.location.latitide && school.location.longitude) {
-      locationLink.href = `https://www.google.com/maps?q=${school.location.latitude},${school.location.longitude}`;
+    if (data.location && data.location.latitide && data.location.longitude) {
+      locationLink.href = `https://www.google.com/maps?q=${data.location.latitude},${data.location.longitude}`;
     } else {
       locationLink.style.display = "none";
     }
