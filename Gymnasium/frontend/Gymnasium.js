@@ -230,83 +230,10 @@ function showError(error) {
 
 let historicalChart = null;
 
-async function showSchoolDetails(schoolName) {
-  try {
-    const response = await apiPost("/api/school-details", {
-      school_name: schoolName,
-    });
-
-    const modal = document.getElementById("schoolDetailsModal");
-    const modalBody = modal.querySelector(".modal-body");
-
-    // Create content for the modal
-    let content = `
-      <div class="mb-4">
-        <h5>Skolinformation</h5>
-        <p><strong>Skola:</strong> ${response.historical_data[0].Name}</p>
-        <p><strong>Kommun:</strong> ${response.historical_data[0].Kommun}</p>
-        ${
-          response.location.latitude
-            ? `
-          <p><strong>Plats:</strong> ${response.location.latitude.toFixed(
-            6
-          )}, ${response.location.longitude.toFixed(6)}</p>
-        `
-            : ""
-        }
-      </div>
-      <div class="table-responsive">
-        <h5>Historisk data</h5>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>År</th>
-              <th>Studieväg</th>
-              <th>Preliminär merit</th>
-              <th>Slutlig merit</th>
-              <th>Median preliminär</th>
-              <th>Median slutlig</th>
-              <th>Antal platser</th>
-              <th>Antagna</th>
-              <th>Reserver</th>
-              <th>Lediga platser</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-
-    response.historical_data.forEach((data) => {
-      content += `
-        <tr>
-          <td>${data.Year}</td>
-          <td>${data.Studievag}</td>
-          <td>${
-            data.Antagningsgrans_prelim?.toFixed(1) || "Ej tillgänglig"
-          }</td>
-          <td>${data.Antagningsgrans_final?.toFixed(1) || "Ej tillgänglig"}</td>
-          <td>${data.Median_prelim?.toFixed(1) || "Ej tillgänglig"}</td>
-          <td>${data.Median_final?.toFixed(1) || "Ej tillgänglig"}</td>
-          <td>${data.Antal_platser_prelim || "Ej tillgänglig"}</td>
-          <td>${data.Antagna_prelim || "Ej tillgänglig"}</td>
-          <td>${data.Reserver_prelim || "Ej tillgänglig"}</td>
-          <td>${data.Lediga_platser_prelim || "Ej tillgänglig"}</td>
-        </tr>
-      `;
-    });
-
-    content += `
-          </tbody>
-        </table>
-      </div>
-    `;
-
-    modalBody.innerHTML = content;
-    const modalInstance = new bootstrap.Modal(modal);
-    modalInstance.show();
-  } catch (error) {
-    console.error("Fel vid hämtning av skoldetaljer:", error);
-    alert("Kunde inte hämta skoldetaljer: " + error.message);
-  }
+function showSchoolDetails(schoolName) {
+  window.location.href = `school-details.html?school=${encodeURIComponent(
+    schoolName
+  )}`;
 }
 
 function updatePagination(total, currentPage, pageSize) {

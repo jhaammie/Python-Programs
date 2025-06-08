@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     localStorage.getItem("selectedSchools") || "[]"
   );
   if (selectedSchools.length < 2) {
-    alert("Please select at least 2 schools to compare");
+    alert("Välj minst 2 skolor för att jämföra");
     window.close();
     return;
   }
@@ -41,14 +41,14 @@ function createMeritChart(schoolData) {
   const datasets = [];
   schoolData.forEach((data, index) => {
     const schoolName =
-      data.historical_data[0]?.school_name || `School ${index + 1}`;
+      data.historical_data[0]?.school_name || `Skola ${index + 1}`;
 
     // Get unique years across all data
     const years = [...new Set(data.historical_data.map((d) => d.year))].sort();
 
     // Create dataset for preliminary merit
     datasets.push({
-      label: `${schoolName} - Preliminary`,
+      label: `${schoolName} - Preliminär`,
       data: years.map((year) => {
         const yearData = data.historical_data.find((d) => d.year === year);
         return yearData ? yearData.prelim_merit : null;
@@ -60,7 +60,7 @@ function createMeritChart(schoolData) {
 
     // Create dataset for final merit
     datasets.push({
-      label: `${schoolName} - Final`,
+      label: `${schoolName} - Slutlig`,
       data: years.map((year) => {
         const yearData = data.historical_data.find((d) => d.year === year);
         return yearData ? yearData.final_merit : null;
@@ -88,7 +88,7 @@ function createMeritChart(schoolData) {
       plugins: {
         title: {
           display: true,
-          text: "Merit Scores Over Time",
+          text: "Meritvärden över tid",
         },
         tooltip: {
           mode: "index",
@@ -100,13 +100,13 @@ function createMeritChart(schoolData) {
           beginAtZero: false,
           title: {
             display: true,
-            text: "Merit Score",
+            text: "Meritvärde",
           },
         },
         x: {
           title: {
             display: true,
-            text: "Year",
+            text: "År",
           },
         },
       },
@@ -120,7 +120,7 @@ function createPlacesChart(schoolData) {
   const datasets = [];
   schoolData.forEach((data, index) => {
     const schoolName =
-      data.historical_data[0]?.school_name || `School ${index + 1}`;
+      data.historical_data[0]?.school_name || `Skola ${index + 1}`;
 
     // Get unique years across all data
     const years = [...new Set(data.historical_data.map((d) => d.year))].sort();
@@ -154,7 +154,7 @@ function createPlacesChart(schoolData) {
       plugins: {
         title: {
           display: true,
-          text: "Available Places Over Time",
+          text: "Tillgängliga platser över tid",
         },
       },
       scales: {
@@ -162,13 +162,13 @@ function createPlacesChart(schoolData) {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Number of Places",
+            text: "Antal platser",
           },
         },
         x: {
           title: {
             display: true,
-            text: "Year",
+            text: "År",
           },
         },
       },
@@ -182,10 +182,10 @@ function createComparisonTable(schoolData) {
     '<div class="table-responsive"><table class="table table-bordered">';
 
   // Table header
-  html += "<thead><tr><th>Metric</th>";
+  html += "<thead><tr><th>Mätvärde</th>";
   schoolData.forEach((data, index) => {
     const schoolName =
-      data.historical_data[0]?.school_name || `School ${index + 1}`;
+      data.historical_data[0]?.school_name || `Skola ${index + 1}`;
     html += `<th>${schoolName}</th>`;
   });
   html += "</tr></thead><tbody>";
@@ -195,24 +195,24 @@ function createComparisonTable(schoolData) {
 
   // Add rows for each metric
   const metrics = [
-    { key: "municipality", label: "Municipality" },
-    { key: "organization", label: "Organization" },
-    { key: "prelim_merit", label: "Preliminary Merit" },
-    { key: "final_merit", label: "Final Merit" },
-    { key: "prelim_places", label: "Preliminary Places" },
-    { key: "final_places", label: "Final Places" },
-    { key: "prelim_accepted", label: "Preliminary Accepted" },
-    { key: "final_accepted", label: "Final Accepted" },
-    { key: "prelim_reserves", label: "Preliminary Reserves" },
-    { key: "final_reserves", label: "Final Reserves" },
-    { key: "prelim_available", label: "Preliminary Available" },
-    { key: "final_available", label: "Final Available" },
+    { key: "municipality", label: "Kommun" },
+    { key: "organization", label: "Organisationsform" },
+    { key: "prelim_merit", label: "Preliminärt meritvärde" },
+    { key: "final_merit", label: "Slutligt meritvärde" },
+    { key: "prelim_places", label: "Preliminära platser" },
+    { key: "final_places", label: "Slutliga platser" },
+    { key: "prelim_accepted", label: "Preliminärt antagna" },
+    { key: "final_accepted", label: "Slutligt antagna" },
+    { key: "prelim_reserves", label: "Preliminära reserver" },
+    { key: "final_reserves", label: "Slutliga reserver" },
+    { key: "prelim_available", label: "Preliminära lediga platser" },
+    { key: "final_available", label: "Slutliga lediga platser" },
   ];
 
   metrics.forEach((metric) => {
     html += `<tr><td>${metric.label}</td>`;
     latestData.forEach((data) => {
-      html += `<td>${data[metric.key] || "N/A"}</td>`;
+      html += `<td>${data[metric.key] || "NA"}</td>`;
     });
     html += "</tr>";
   });
