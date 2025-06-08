@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 import bcrypt
 import yaml
@@ -46,7 +46,7 @@ class TokenData(BaseModel):
     user_id: Optional[UUID] = None
 
 def create_access_token(user_id: UUID) -> Tuple[str, datetime]:
-    expires_at = datetime.now(datetime.UTC) + JWT_EXPIRATION
+    expires_at = datetime.now(timezone.utc) + JWT_EXPIRATION
     payload = {
         'user_id': str(user_id),
         'exp': expires_at
@@ -75,7 +75,7 @@ async def register(user: UserCreate):
     
     # Create user with UUID
     user_id = uuid4()
-    created_at = datetime.now(datetime.UTC)
+    created_at = datetime.now(timezone.utc)
     CreateUser(str(user_id), user.email, hashed_password.decode('utf-8'), user.first_name, user.last_name, created_at)
     
     # Generate token

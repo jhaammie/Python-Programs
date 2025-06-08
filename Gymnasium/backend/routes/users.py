@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 from hoohoohee import GetUserById, UpdateUser
 from .auth import get_current_user, UserBase
 
@@ -49,7 +49,7 @@ async def update_user_info(
         raise HTTPException(status_code=404, detail="User not found")
     
     # Update user
-    updated_at = datetime.now(datetime.UTC)
+    updated_at = datetime.now(timezone.utc)
     success = UpdateUser(
         str(current_user),
         user_update.email or user[1],
