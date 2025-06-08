@@ -9,6 +9,18 @@ function formatValue(value) {
 // Store chart instances
 const programCharts = {};
 
+// Destroy all existing charts
+function destroyAllCharts() {
+  Object.values(programCharts).forEach((chart) => {
+    if (chart) {
+      chart.destroy();
+    }
+  });
+  Object.keys(programCharts).forEach((key) => {
+    delete programCharts[key];
+  });
+}
+
 // Create a chart for a program
 function createProgramCharts(programData, programCode, programName) {
   const container = document.createElement("div");
@@ -226,6 +238,10 @@ async function fetchSchoolDetails() {
   }
 
   try {
+    // Clear existing content and charts
+    document.getElementById("programSections").innerHTML = "";
+    destroyAllCharts();
+
     const data = await apiPost("/api/school-details", {
       school_name: schoolName,
     });
