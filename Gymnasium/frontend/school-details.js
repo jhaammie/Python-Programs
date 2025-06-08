@@ -55,6 +55,7 @@ function createProgramCharts(programData, programCode, programName) {
   container.className = "program-section mb-4";
   container.innerHTML = `
     <h4 class="mb-3">${programName} (${programCode})</h4>
+    <small class="text-muted mb-3 d-block">* Värde 0 indikerar att data inte är tillgänglig för det året</small>
     <div class="row">
       <div class="col-md-6">
         <div class="card">
