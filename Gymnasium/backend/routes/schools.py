@@ -188,47 +188,64 @@ async def get_regression_predictions(location: PredictionRequest):
         historical_data = GetSchoolHistoricalData(school_name)
         
         if len(historical_data) > 1:  # Need at least 2 points for regression
-            # Extract prelim and final scores
-            prelim_scores = [row[6] for row in historical_data]  # Antagningsgrans_prelim
-            final_scores = [row[7] for row in historical_data]   # Antagningsgrans_final
+            # Extract prelim scores, final scores, and program codes, filtering out None/NaN values
+            prelim_scores = []
+            final_scores = []
+            program_codes = []
+            for row in historical_data:
+                if row[6] is not None and row[7] is not None:  # Check for None values
+                    prelim_scores.append(row[6])  # Antagningsgrans_prelim
+                    final_scores.append(row[7])   # Antagningsgrans_final
+                    program_codes.append(row[4])  # Studievagskod
             
-            # Fit regression model
-            X = np.array(prelim_scores).reshape(-1, 1)
-            y = np.array(final_scores)
-            model = LinearRegression()
-            model.fit(X, y)
-            
-            # Predict final score
-            predicted_final = model.predict([[location.prelim_score]])[0]
-            
-            # Get school location
-            school_location = GetSchoolLocation(school_name)
-            if school_location:
-                predictions.append({
-                    "Year": historical_data[0][0],  # Use most recent year
-                    "Kommun": historical_data[0][1],
-                    "Name": school_name,
-                    "Organisitionsform": historical_data[0][3],
-                    "Studievagskod": historical_data[0][4],
-                    "Studievag": historical_data[0][5],
-                    "Antagningsgrans_prelim": location.prelim_score,
-                    "Antagningsgrans_final": predicted_final,
-                    "Median_prelim": historical_data[0][8],
-                    "Median_final": historical_data[0][9],
-                    "Antal_platser_prelim": historical_data[0][10],
-                    "Antal_platser_final": historical_data[0][11],
-                    "Antagna_prelim": historical_data[0][12],
-                    "Antagna_final": historical_data[0][13],
-                    "Reserver_prelim": historical_data[0][14],
-                    "Reserver_final": historical_data[0][15],
-                    "Lediga_platser_prelim": historical_data[0][16],
-                    "Lediga_platser_final": historical_data[0][17],
-                    "grans_diff": predicted_final - location.prelim_score,
-                    "median_diff": historical_data[0][19],
-                    "latitude": school_location[0],
-                    "longitude": school_location[1],
-                    "distance": round(school[1], 1)  # Distance is already calculated by GetGymnasiumWithinRadius
-                })
+            if len(prelim_scores) > 1:  # Need at least 2 valid points for regression
+                # Create feature matrix with prelim scores and program codes
+                X = np.column_stack((
+                    np.array(prelim_scores).reshape(-1, 1),
+                    np.array(program_codes).reshape(-1, 1)
+                ))
+                y = np.array(final_scores)
+                
+                # Skip if any NaN values
+                if not np.isnan(X).any() and not np.isnan(y).any():
+                    model = LinearRegression()
+                    model.fit(X, y)
+                    
+                    # Predict final score using both prelim score and program code
+                    current_program_code = historical_data[0][4]  # Use most recent program code
+                    predicted_final = model.predict([[
+                        location.prelim_score,
+                        current_program_code
+                    ]])[0]
+                    
+                    # Get school location
+                    school_location = GetSchoolLocation(school_name)
+                    if school_location:
+                        predictions.append({
+                            "Year": historical_data[0][0],  # Use most recent year
+                            "Kommun": historical_data[0][1],
+                            "Name": school_name,
+                            "Organisitionsform": historical_data[0][3],
+                            "Studievagskod": historical_data[0][4],
+                            "Studievag": historical_data[0][5],
+                            "Antagningsgrans_prelim": location.prelim_score,
+                            "Antagningsgrans_final": predicted_final,
+                            "Median_prelim": historical_data[0][8],
+                            "Median_final": historical_data[0][9],
+                            "Antal_platser_prelim": historical_data[0][10],
+                            "Antal_platser_final": historical_data[0][11],
+                            "Antagna_prelim": historical_data[0][12],
+                            "Antagna_final": historical_data[0][13],
+                            "Reserver_prelim": historical_data[0][14],
+                            "Reserver_final": historical_data[0][15],
+                            "Lediga_platser_prelim": historical_data[0][16],
+                            "Lediga_platser_final": historical_data[0][17],
+                            "grans_diff": predicted_final - location.prelim_score,
+                            "median_diff": historical_data[0][19],
+                            "latitude": school_location[0],
+                            "longitude": school_location[1],
+                            "distance": round(school[1], 1)  # Distance is already calculated by GetGymnasiumWithinRadius
+                        })
     
     # Sort by distance
     predictions.sort(key=lambda x: x["distance"])
