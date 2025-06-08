@@ -74,37 +74,66 @@ function displayPredictions(predictions) {
     return;
   }
 
-  const table = document.createElement("table");
-  table.className = "table table-striped";
+  // Create a row for the cards
+  const row = document.createElement("div");
+  row.className = "row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4";
 
-  // Add table header
-  const thead = document.createElement("thead");
-  thead.innerHTML = `
-    <tr>
-      <th>Skola</th>
-      <th>Kommun</th>
-      <th>Studieväg</th>
-      <th>Prelim merit</th>
-      <th>Predikterad final merit</th>
-      <th>Avstånd (km)</th>
-    </tr>
-  `;
-  table.appendChild(thead);
-
-  // Add table body
-  const tbody = document.createElement("tbody");
   predictions.forEach((pred) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${pred.Name}</td>
-      <td>${pred.Kommun}</td>
-      <td>${pred.Studievag}</td>
-      <td>${pred.Antagningsgrans_prelim?.toFixed(1) || "N/A"}</td>
-      <td>${pred.Antagningsgrans_final?.toFixed(1) || "N/A"}</td>
-      <td>${pred.distance?.toFixed(1) || "N/A"}</td>
+    const col = document.createElement("div");
+    col.className = "col";
+
+    const card = document.createElement("div");
+    card.className = "card h-100";
+
+    // Calculate confidence level color
+    let confidenceColor = "text-danger";
+    if (pred.confidence >= 70) {
+      confidenceColor = "text-success";
+    } else if (pred.confidence >= 40) {
+      confidenceColor = "text-warning";
+    }
+
+    // Calculate probability color
+    let probabilityColor = "text-danger";
+    if (pred.probability >= 70) {
+      probabilityColor = "text-success";
+    } else if (pred.probability >= 40) {
+      probabilityColor = "text-warning";
+    }
+
+    card.innerHTML = `
+      <div class="card-body">
+        <h5 class="card-title">${pred.Name}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">${pred.Kommun}</h6>
+        <p class="card-text">
+          <strong>Studieväg:</strong> ${pred.Studievag}<br>
+          <strong>Prelim merit:</strong> ${
+            pred.Antagningsgrans_prelim?.toFixed(1) || "N/A"
+          }<br>
+          <strong>Predikterad final merit:</strong> ${
+            pred.Antagningsgrans_final?.toFixed(1) || "N/A"
+          }<br>
+          <strong>Chans att komma in:</strong> <span class="${probabilityColor}">${
+      pred.probability?.toFixed(1) || "N/A"
+    }%</span><br>
+          <strong>Tillförlitlighet:</strong> <span class="${confidenceColor}">${
+      pred.confidence?.toFixed(1) || "N/A"
+    }%</span><br>
+          <strong>Avstånd:</strong> ${pred.distance?.toFixed(1) || "N/A"} km
+        </p>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted">
+          Antal platser: ${pred.Antal_platser_final || "N/A"} | 
+          Antagna: ${pred.Antagna_final || "N/A"} | 
+          Lediga: ${pred.Lediga_platser_final || "N/A"}
+        </small>
+      </div>
     `;
-    tbody.appendChild(row);
+
+    col.appendChild(card);
+    row.appendChild(col);
   });
-  table.appendChild(tbody);
-  container.appendChild(table);
+
+  container.appendChild(row);
 }
