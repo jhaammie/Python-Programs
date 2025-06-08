@@ -21,8 +21,36 @@ function destroyAllCharts() {
   });
 }
 
+// Generate a simple hash for a string
+function generateHash(str) {
+  // Add a random number to the string
+  const randomNum = Math.floor(Math.random() * 1000000);
+  const strWithRandom = `${str}_${randomNum}`;
+
+  let hash = 0;
+  for (let i = 0; i < strWithRandom.length; i++) {
+    const char = strWithRandom.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
+
 // Create a chart for a program
 function createProgramCharts(programData, programCode, programName) {
+  // Validate program code and name
+  if (!programCode || !programName) {
+    console.error("Invalid program data:", { programCode, programName });
+    return;
+  }
+
+  // Create a safe ID by removing any special characters and adding a hash
+  const safeProgramCode = programCode.replace(/[^a-zA-Z0-9]/g, "_");
+  const safeProgramName = programName.replace(/[^a-zA-Z0-9]/g, "_");
+  const uniqueHash = generateHash(
+    `${programCode}_${programName}_${Date.now()}`
+  );
+
   const container = document.createElement("div");
   container.className = "program-section mb-4";
   container.innerHTML = `
@@ -33,7 +61,7 @@ function createProgramCharts(programData, programCode, programName) {
           <div class="card-body">
             <h5 class="card-title">Meritvärden</h5>
             <div class="chart-container">
-              <canvas id="meritChart_${programCode}"></canvas>
+              <canvas id="meritChart_${safeProgramCode}_${uniqueHash}"></canvas>
             </div>
           </div>
         </div>
@@ -43,7 +71,7 @@ function createProgramCharts(programData, programCode, programName) {
           <div class="card-body">
             <h5 class="card-title">Platser</h5>
             <div class="chart-container">
-              <canvas id="placesChart_${programCode}"></canvas>
+              <canvas id="placesChart_${safeProgramCode}_${uniqueHash}"></canvas>
             </div>
           </div>
         </div>
@@ -54,9 +82,13 @@ function createProgramCharts(programData, programCode, programName) {
 
   // Create merit chart
   const meritCtx = document
-    .getElementById(`meritChart_${programCode}`)
+    .getElementById(`meritChart_${safeProgramCode}_${uniqueHash}`)
     .getContext("2d");
-  programCharts[`merit_${programCode}`] = new Chart(meritCtx, {
+  const meritChartId = `merit_${safeProgramCode}_${uniqueHash}`;
+  if (programCharts[meritChartId]) {
+    programCharts[meritChartId].destroy();
+  }
+  programCharts[meritChartId] = new Chart(meritCtx, {
     type: "line",
     data: {
       labels: programData.map((d) => d.Year),
@@ -124,9 +156,13 @@ function createProgramCharts(programData, programCode, programName) {
 
   // Create places chart
   const placesCtx = document
-    .getElementById(`placesChart_${programCode}`)
+    .getElementById(`placesChart_${safeProgramCode}_${uniqueHash}`)
     .getContext("2d");
-  programCharts[`places_${programCode}`] = new Chart(placesCtx, {
+  const placesChartId = `places_${safeProgramCode}_${uniqueHash}`;
+  if (programCharts[placesChartId]) {
+    programCharts[placesChartId].destroy();
+  }
+  programCharts[placesChartId] = new Chart(placesCtx, {
     type: "line",
     data: {
       labels: programData.map((d) => d.Year),
@@ -266,6 +302,12 @@ async function fetchSchoolDetails() {
     // Group historical data by program
     const programData = {};
     data.historical_data.forEach((entry) => {
+      // Validate program data
+      if (!entry.Studievagskod || !entry.Studievag) {
+        console.warn("Skipping entry with missing program data:", entry);
+        return;
+      }
+
       const key = `${entry.Studievagskod}_${entry.Studievag}`;
       if (!programData[key]) {
         programData[key] = {
