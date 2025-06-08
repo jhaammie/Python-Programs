@@ -74,7 +74,7 @@ class PredictionRequest(BaseModel):
 class SchoolNameRequest(BaseModel):
     school_name: str
 
-@router.get("/schools", response_model=SchoolDetails)
+@router.post("/school-details", response_model=SchoolDetails)
 async def get_school_details(request: SchoolNameRequest):
     historical_data = GetSchoolHistoricalData(request.school_name)
     location = GetSchoolLocation(request.school_name)

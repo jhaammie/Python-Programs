@@ -28,14 +28,14 @@ async function getPredictions(event) {
   }
 }
 
-async function showSchoolDetails(schoolName) {
-  try {
-    const data = await apiGet(`/api/school-details/${schoolName}`);
-    renderSchoolDetails(data);
-  } catch (error) {
-    alert("Kunde inte hämta skoldetaljer: " + error.message);
-  }
-}
+// async function showSchoolDetails(schoolName) {
+//   try {
+//     const data = await apiGet(`/api/school-details/${schoolName}`);
+//     renderSchoolDetails(data);
+//   } catch (error) {
+//     alert("Kunde inte hämta skoldetaljer: " + error.message);
+//   }
+// }
 
 function getConfidenceLevel(scoreDiff, availablePlaces) {
   // Calculate confidence based on score difference and available places

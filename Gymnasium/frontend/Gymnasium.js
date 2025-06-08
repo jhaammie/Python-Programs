@@ -232,7 +232,7 @@ let historicalChart = null;
 
 async function showSchoolDetails(schoolName) {
   try {
-    const response = await apiPost("/api/schools", {
+    const response = await apiPost("/api/school-details", {
       school_name: schoolName,
     });
 
