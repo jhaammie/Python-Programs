@@ -103,7 +103,7 @@ async def get_school_details(school_name: str):
         }
     }
 
-@router.post("/schools/nearby", response_model=PaginatedResponse)
+@router.post("/gymnasium-within-radius", response_model=PaginatedResponse)
 async def get_nearby_schools(location: LocationRequest):
     schools, total_count = GetGymnasiumWithinRadius(
         location.latitude,
