@@ -95,53 +95,77 @@ function displayPredictions(predictions) {
     col.className = "col";
 
     const card = document.createElement("div");
-    card.className = "card h-100";
+    card.className = "card h-100 prediction-card";
 
     // Calculate probability based on prelim score and final score
     const probability =
-      pred.Antagningsgrans_prelim >= pred.Antagningsgrans_final ? 100 : 0;
+      pred.Antagningsgrans_prelim <= pred.Antagningsgrans_final ? 100 : 0;
 
     // Calculate confidence based on available data
-    const confidence = pred.Antal_platser_prelim > 0 ? 100 : 0;
+    const confidence = pred.Antal_platser_final > 0 ? 100 : 0;
 
-    // Calculate confidence level color
-    let confidenceColor = "text-danger";
+    // Calculate confidence level class
+    let confidenceClass = "confidence-low";
     if (confidence >= 70) {
-      confidenceColor = "text-success";
+      confidenceClass = "confidence-high";
     } else if (confidence >= 40) {
-      confidenceColor = "text-warning";
+      confidenceClass = "confidence-medium";
     }
 
-    // Calculate probability color
-    let probabilityColor = "text-danger";
+    // Calculate probability class
+    let probabilityClass = "confidence-low";
     if (probability >= 70) {
-      probabilityColor = "text-success";
+      probabilityClass = "confidence-high";
     } else if (probability >= 40) {
-      probabilityColor = "text-warning";
+      probabilityClass = "confidence-medium";
     }
 
     const cardContent = `
       <div class="card-body">
         <h5 class="card-title">${pred.Name}</h5>
-        <h6 class="card-subtitle mb-2 text-muted">${pred.Kommun}</h6>
-        <p class="card-text">
-          <strong>Studieväg:</strong> ${pred.Studievag}<br>
-          <strong>Prelim merit:</strong> ${
-            pred.Antagningsgrans_prelim?.toFixed(1) || "N/A"
-          }<br>
-          <strong>Predikterad final merit:</strong> ${
-            pred.Antagningsgrans_final?.toFixed(1) || "N/A"
-          }<br>
-          <strong>Chans att komma in:</strong> <span class="${probabilityColor}">${probability}%</span><br>
-          <strong>Tillförlitlighet:</strong> <span class="${confidenceColor}">${confidence}%</span><br>
-          <strong>Avstånd:</strong> ${pred.distance?.toFixed(1) || "N/A"} km
-        </p>
+        <h6 class="card-subtitle mb-3 text-muted">${pred.Kommun}</h6>
+        <div class="card-text">
+          <div class="mb-2">
+            <strong>Studieväg:</strong><br>
+            <span class="text-muted">${pred.Studievag}</span>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6">
+              <strong>Prelim merit:</strong><br>
+              <span>${pred.Antagningsgrans_prelim?.toFixed(1) || "N/A"}</span>
+            </div>
+            <div class="col-6">
+              <strong>Predikterad final merit:</strong><br>
+              <span>${pred.Antagningsgrans_final?.toFixed(1) || "N/A"}</span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6">
+              <strong>Chans att komma in:</strong><br>
+              <span class="${probabilityClass}">${probability}%</span>
+            </div>
+            <div class="col-6">
+              <strong>Tillförlitlighet:</strong><br>
+              <span class="${confidenceClass}">${confidence}%</span>
+            </div>
+          </div>
+          <div class="mb-2">
+            <strong>Avstånd:</strong><br>
+            <span>${pred.distance?.toFixed(1) || "N/A"} km</span>
+          </div>
+        </div>
       </div>
-      <div class="card-footer">
+      <div class="card-footer bg-light">
         <small class="text-muted">
-          Antal platser: ${pred.Antal_platser_prelim || "N/A"} | 
-          Antagna: ${pred.Antagna_prelim || "N/A"} | 
-          Lediga: ${pred.Lediga_platser_prelim || "N/A"}
+          <div class="row">
+            <div class="col-4">Platser: ${
+              pred.Antal_platser_final || "N/A"
+            }</div>
+            <div class="col-4">Antagna: ${pred.Antagna_final || "N/A"}</div>
+            <div class="col-4">Lediga: ${
+              pred.Lediga_platser_final || "N/A"
+            }</div>
+          </div>
         </small>
       </div>
     `;
