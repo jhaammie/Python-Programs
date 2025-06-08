@@ -6,58 +6,80 @@ function formatValue(value) {
   return Number(value).toFixed(1);
 }
 
-let meritChart = null;
-let placesChart = null;
+// Store chart instances
+const programCharts = {};
 
-function createMeritChart(data) {
-  const ctx = document.getElementById("meritChart").getContext("2d");
+// Create a chart for a program
+function createProgramCharts(programData, programCode, programName) {
+  const container = document.createElement("div");
+  container.className = "program-section mb-4";
+  container.innerHTML = `
+    <h4 class="mb-3">${programName} (${programCode})</h4>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Meritvärden</h5>
+            <canvas id="meritChart_${programCode}" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Platser</h5>
+            <canvas id="placesChart_${programCode}" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("programSections").appendChild(container);
 
-  // Get unique years and sort them
-  const years = [...new Set(data.historical_data.map((d) => d.Year))].sort();
-
-  // Create datasets for each merit type
-  const datasets = [
-    {
-      label: "Preliminär merit",
-      data: years.map((year) => {
-        const yearData = data.historical_data.find((d) => d.Year === year);
-        return yearData ? yearData.Antagningsgrans_prelim : null;
-      }),
-      borderColor: "rgb(75, 192, 192)",
-      backgroundColor: "rgba(75, 192, 192, 0.2)",
-      tension: 0.1,
-    },
-    {
-      label: "Slutlig merit",
-      data: years.map((year) => {
-        const yearData = data.historical_data.find((d) => d.Year === year);
-        return yearData ? yearData.Antagningsgrans_final : null;
-      }),
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      tension: 0.1,
-    },
-    {
-      label: "Median merit",
-      data: years.map((year) => {
-        const yearData = data.historical_data.find((d) => d.Year === year);
-        return yearData ? yearData.Median_prelim : null;
-      }),
-      borderColor: "rgb(54, 162, 235)",
-      backgroundColor: "rgba(54, 162, 235, 0.2)",
-      tension: 0.1,
-    },
-  ];
-
-  if (meritChart) {
-    meritChart.destroy();
-  }
-
-  meritChart = new Chart(ctx, {
+  // Create merit chart
+  const meritCtx = document
+    .getElementById(`meritChart_${programCode}`)
+    .getContext("2d");
+  programCharts[`merit_${programCode}`] = new Chart(meritCtx, {
     type: "line",
     data: {
-      labels: years,
-      datasets: datasets,
+      labels: programData.map((d) => d.Year),
+      datasets: [
+        {
+          label: "Preliminär merit",
+          data: programData.map((d) => d.PreliminaryMerit),
+          borderColor: "#4e73df",
+          backgroundColor: "rgba(78, 115, 223, 0.1)",
+          borderWidth: 2,
+          tension: 0.1,
+        },
+        {
+          label: "Preliminär median",
+          data: programData.map((d) => d.PreliminaryMedian),
+          borderColor: "#4e73df",
+          backgroundColor: "rgba(78, 115, 223, 0.1)",
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.1,
+        },
+        {
+          label: "Slutlig merit",
+          data: programData.map((d) => d.FinalMerit),
+          borderColor: "#1cc88a",
+          backgroundColor: "rgba(28, 200, 138, 0.1)",
+          borderWidth: 2,
+          tension: 0.1,
+        },
+        {
+          label: "Slutlig median",
+          data: programData.map((d) => d.FinalMedian),
+          borderColor: "#1cc88a",
+          backgroundColor: "rgba(28, 200, 138, 0.1)",
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.1,
+        },
+      ],
     },
     options: {
       responsive: true,
@@ -74,72 +96,94 @@ function createMeritChart(data) {
       },
       scales: {
         y: {
-          beginAtZero: false,
-          title: {
-            display: true,
-            text: "Meritvärde",
-          },
-        },
-        x: {
-          title: {
-            display: true,
-            text: "År",
+          min: 0,
+          max: 340,
+          ticks: {
+            stepSize: 50,
           },
         },
       },
     },
   });
-}
 
-function createPlacesChart(data) {
-  const ctx = document.getElementById("placesChart").getContext("2d");
-
-  // Get unique years and sort them
-  const years = [...new Set(data.historical_data.map((d) => d.Year))].sort();
-
-  // Create datasets for each places type
-  const datasets = [
-    {
-      label: "Antal platser",
-      data: years.map((year) => {
-        const yearData = data.historical_data.find((d) => d.Year === year);
-        return yearData ? yearData.Antal_platser_prelim : null;
-      }),
-      borderColor: "rgb(75, 192, 192)",
-      backgroundColor: "rgba(75, 192, 192, 0.2)",
-      tension: 0.1,
-    },
-    {
-      label: "Antagna",
-      data: years.map((year) => {
-        const yearData = data.historical_data.find((d) => d.Year === year);
-        return yearData ? yearData.Antagna_prelim : null;
-      }),
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      tension: 0.1,
-    },
-    {
-      label: "Tillgängliga platser",
-      data: years.map((year) => {
-        const yearData = data.historical_data.find((d) => d.Year === year);
-        return yearData ? yearData.Lediga_platser_prelim : null;
-      }),
-      borderColor: "rgb(54, 162, 235)",
-      backgroundColor: "rgba(54, 162, 235, 0.2)",
-      tension: 0.1,
-    },
-  ];
-
-  if (placesChart) {
-    placesChart.destroy();
-  }
-
-  placesChart = new Chart(ctx, {
+  // Create places chart
+  const placesCtx = document
+    .getElementById(`placesChart_${programCode}`)
+    .getContext("2d");
+  programCharts[`places_${programCode}`] = new Chart(placesCtx, {
     type: "line",
     data: {
-      labels: years,
-      datasets: datasets,
+      labels: programData.map((d) => d.Year),
+      datasets: [
+        {
+          label: "Antal platser preliminär",
+          data: programData.map((d) => d.Antal_platser_prelim),
+          borderColor: "#4e73df",
+          backgroundColor: "rgba(78, 115, 223, 0.1)",
+          borderWidth: 2,
+          tension: 0.1,
+        },
+        {
+          label: "Antal platser slutlig",
+          data: programData.map((d) => d.Antal_platser_final),
+          borderColor: "#4e73df",
+          backgroundColor: "rgba(78, 115, 223, 0.1)",
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.1,
+        },
+        {
+          label: "Antagna preliminär",
+          data: programData.map((d) => d.Antagna_prelim),
+          borderColor: "#1cc88a",
+          backgroundColor: "rgba(28, 200, 138, 0.1)",
+          borderWidth: 2,
+          tension: 0.1,
+        },
+        {
+          label: "Antagna slutlig",
+          data: programData.map((d) => d.Antagna_final),
+          borderColor: "#1cc88a",
+          backgroundColor: "rgba(28, 200, 138, 0.1)",
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.1,
+        },
+        {
+          label: "Reserver preliminär",
+          data: programData.map((d) => d.Reserver_prelim),
+          borderColor: "#f6c23e",
+          backgroundColor: "rgba(246, 194, 62, 0.1)",
+          borderWidth: 2,
+          tension: 0.1,
+        },
+        {
+          label: "Reserver slutlig",
+          data: programData.map((d) => d.Reserver_final),
+          borderColor: "#f6c23e",
+          backgroundColor: "rgba(246, 194, 62, 0.1)",
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.1,
+        },
+        {
+          label: "Lediga platser preliminär",
+          data: programData.map((d) => d.Lediga_platser_prelim),
+          borderColor: "#e74a3b",
+          backgroundColor: "rgba(231, 74, 59, 0.1)",
+          borderWidth: 2,
+          tension: 0.1,
+        },
+        {
+          label: "Lediga platser slutlig",
+          data: programData.map((d) => d.Lediga_platser_final),
+          borderColor: "#e74a3b",
+          backgroundColor: "rgba(231, 74, 59, 0.1)",
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.1,
+        },
+      ],
     },
     options: {
       responsive: true,
@@ -156,16 +200,10 @@ function createPlacesChart(data) {
       },
       scales: {
         y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Antal platser",
-          },
-        },
-        x: {
-          title: {
-            display: true,
-            text: "År",
+          min: 0,
+          max: 100,
+          ticks: {
+            stepSize: 20,
           },
         },
       },
@@ -173,14 +211,13 @@ function createPlacesChart(data) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  // Get school name from URL parameters
+// Fetch and display school details
+async function fetchSchoolDetails() {
   const urlParams = new URLSearchParams(window.location.search);
-  const schoolName = urlParams.get("school");
+  const schoolId = urlParams.get("id");
 
-  if (!schoolName) {
-    alert("Ingen skola vald");
-    window.location.href = "index.html";
+  if (!schoolId) {
+    alert("Inget skol-ID angivet");
     return;
   }
 
@@ -199,17 +236,41 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Update Google Maps link
     const locationLink = document.getElementById("locationLink");
-    if (data.location && data.location.latitide && data.location.longitude) {
+    alert(data.location);
+    if (data.location && data.location.latitude && data.location.longitude) {
       locationLink.href = `https://www.google.com/maps?q=${data.location.latitude},${data.location.longitude}`;
     } else {
       locationLink.style.display = "none";
     }
 
-    // Create charts
-    createMeritChart(data);
-    createPlacesChart(data);
+    // Group historical data by program
+    const programData = {};
+    data.historical_data.forEach((entry) => {
+      const key = `${entry.Studievagskod}_${entry.Studievag}`;
+      if (!programData[key]) {
+        programData[key] = {
+          code: entry.Studievagskod,
+          name: entry.Studievag,
+          data: [],
+        };
+      }
+      programData[key].data.push(entry);
+    });
+
+    // Sort data by year for each program
+    Object.values(programData).forEach((program) => {
+      program.data.sort((a, b) => a.Year - b.Year);
+    });
+
+    // Create charts for each program
+    Object.values(programData).forEach((program) => {
+      createProgramCharts(program.data, program.code, program.name);
+    });
   } catch (error) {
     console.error("Error fetching school details:", error);
     alert("Kunde inte hämta skoldetaljer");
   }
-});
+}
+
+// Initialize when DOM is loaded
+document.addEventListener("DOMContentLoaded", fetchSchoolDetails);
