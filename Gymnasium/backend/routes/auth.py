@@ -71,7 +71,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UUID:
     return token_data.user_id
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    try:
+        # First try to verify with the stored hash
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except ValueError:
+        # If the stored hash is invalid, hash the plain password and compare
+        try:
+            new_hash = bcrypt.hashpw(plain_password.encode('utf-8'), bcrypt.gensalt())
+            return new_hash == hashed_password.encode('utf-8')
+        except ValueError:
+            return False
 
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate):
