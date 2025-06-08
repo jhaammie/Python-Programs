@@ -20,7 +20,9 @@ function createProgramCharts(programData, programCode, programName) {
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Meritvärden</h5>
-            <canvas id="meritChart_${programCode}" height="300"></canvas>
+            <div class="chart-container">
+              <canvas id="meritChart_${programCode}"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -28,7 +30,9 @@ function createProgramCharts(programData, programCode, programName) {
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Platser</h5>
-            <canvas id="placesChart_${programCode}" height="300"></canvas>
+            <div class="chart-container">
+              <canvas id="placesChart_${programCode}"></canvas>
+            </div>
           </div>
         </div>
       </div>
