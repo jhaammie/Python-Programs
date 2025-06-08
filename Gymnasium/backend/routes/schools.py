@@ -82,26 +82,26 @@ async def get_school_details(request: SchoolNameRequest):
     formatted_data = []
     for row in historical_data:
         d = {
-            "Year": row[0],
-            "Kommun": row[1],
-            "Name": row[2],
-            "Organisitionsform": row[3],
-            "Studievagskod": row[4],
-            "Studievag": row[5],
-            "Antagningsgrans_prelim": row[6],
-            "Antagningsgrans_final": row[7],
-            "Median_prelim": row[8],
-            "Median_final": row[9],
-            "Antal_platser_prelim": row[10],
-            "Antal_platser_final": row[11],
-            "Antagna_prelim": row[12],
-            "Antagna_final": row[13],
-            "Reserver_prelim": row[14],
-            "Reserver_final": row[15],
-            "Lediga_platser_prelim": row[16],
-            "Lediga_platser_final": row[17],
-            "grans_diff": row[18],
-            "median_diff": row[19]
+            "Year": row[0],  # år
+            "Kommun": row[15],  # kommun
+            "Name": request.school_name,  # Use the requested school name
+            "Organisitionsform": row[14],  # organistionsform
+            "Studievagskod": row[16],  # studievagskod
+            "Studievag": row[1],  # studieväg
+            "Antagningsgrans_prelim": row[2],  # antagningsgräns_prelim
+            "Antagningsgrans_final": row[3],  # antagningsgräns_final
+            "Median_prelim": row[4],  # median_prelim
+            "Median_final": row[5],  # median_final
+            "Antal_platser_prelim": row[6],  # antal_platser_prelim
+            "Antal_platser_final": row[7],  # antal_platser_final
+            "Antagna_prelim": row[8],  # antagna_prelim
+            "Antagna_final": row[9],  # antagna_final
+            "Reserver_prelim": row[10],  # reserver_prelim
+            "Reserver_final": row[11],  # reserver_final
+            "Lediga_platser_prelim": row[12],  # lediga_platser_prelim
+            "Lediga_platser_final": row[13],  # lediga_platser_final
+            "grans_diff": row[17],  
+            "median_diff": row[18]
         }
         formatted_data.append(d)
     
