@@ -53,21 +53,24 @@ async function getGymnasiumWithInRadius() {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
 
-    const data = await apiPost("/api/gymnasium-within-radius", {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      radius: radius,
-      sortBy: sortBy,
-      sortOrder: sortOrder,
-      minpreMerit: minpreMerit,
-      maxpreMerit: maxpreMerit,
-      minfinMerit: minfinMerit,
-      maxfinMerit: maxfinMerit,
-      programs: programs,
-      year: year,
-      page: currentPage,
-      pageSize: pageSize,
-    });
+    const data = await apiPost(
+      `${window.CONFIG.API_BASE_URL}/gymnasium-within-radius`,
+      {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        radius: radius,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
+        minpreMerit: minpreMerit,
+        maxpreMerit: maxpreMerit,
+        minfinMerit: minfinMerit,
+        maxfinMerit: maxfinMerit,
+        programs: programs,
+        year: year,
+        page: currentPage,
+        pageSize: pageSize,
+      }
+    );
 
     renderGymnasiumData(data.data);
     updatePagination(data.total, data.page, data.pageSize);

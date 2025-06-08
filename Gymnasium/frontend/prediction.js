@@ -1,8 +1,8 @@
 async function getPredictions(event) {
   event.preventDefault();
-  const prelimScore = document.getElementById("prelimScore").value;
-  const radius = document.getElementById("radius").value;
-  const year = document.getElementById("year").value;
+
+  const prelimScore = document.getElementById("prelimScore")?.value;
+  const radius = document.getElementById("radius")?.value;
 
   if (!prelimScore || !radius) {
     alert("Vänligen ange både meritvärde och avstånd");
@@ -15,16 +15,28 @@ async function getPredictions(event) {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
 
-    const data = await apiPost("/api/schools/predictions/regression", {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      radius: parseInt(radius),
-      prelim_score: parseFloat(prelimScore),
-    });
+    const response = await apiPost(
+      `${window.CONFIG.API_BASE_URL}/schools/predictions/regression`,
+      {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        radius: parseInt(radius),
+        prelim_score: parseFloat(prelimScore),
+      }
+    );
 
-    renderPredictions(data);
+    displayPredictions(response);
   } catch (error) {
-    alert("Kunde inte hämta förutsägelser: " + error.message);
+    console.error("Error getting predictions:", error);
+    if (error.message.includes("geolocation")) {
+      alert(
+        "Kunde inte hämta din position. Kontrollera att du har gett tillstånd för plats."
+      );
+    } else {
+      alert(
+        "Ett fel uppstod när förutsägelserna skulle hämtas. Försök igen senare."
+      );
+    }
   }
 }
 
@@ -50,8 +62,10 @@ function getConfidenceLevel(scoreDiff, availablePlaces) {
   }
 }
 
-function renderPredictions(predictions) {
+function displayPredictions(predictions) {
   const container = document.getElementById("predictionsContainer");
+  if (!container) return;
+
   container.innerHTML = "";
 
   if (!predictions || predictions.length === 0) {
@@ -62,33 +76,35 @@ function renderPredictions(predictions) {
 
   const table = document.createElement("table");
   table.className = "table table-striped";
-  table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Skola</th>
-        <th>Kommun</th>
-        <th>Studieväg</th>
-        <th>Prelim merit</th>
-        <th>Predikterad final merit</th>
-        <th>Avstånd (km)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  `;
 
-  const tbody = table.querySelector("tbody");
+  // Add table header
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>Skola</th>
+      <th>Kommun</th>
+      <th>Studieväg</th>
+      <th>Prelim merit</th>
+      <th>Predikterad final merit</th>
+      <th>Avstånd (km)</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+
+  // Add table body
+  const tbody = document.createElement("tbody");
   predictions.forEach((pred) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${pred.Name}</td>
       <td>${pred.Kommun}</td>
       <td>${pred.Studievag}</td>
-      <td>${pred.Antagningsgrans_prelim}</td>
-      <td>${pred.Antagningsgrans_final.toFixed(1)}</td>
-      <td>${pred.distance}</td>
+      <td>${pred.Antagningsgrans_prelim?.toFixed(1) || "N/A"}</td>
+      <td>${pred.Antagningsgrans_final?.toFixed(1) || "N/A"}</td>
+      <td>${pred.distance?.toFixed(1) || "N/A"}</td>
     `;
     tbody.appendChild(row);
   });
-
+  table.appendChild(tbody);
   container.appendChild(table);
 }

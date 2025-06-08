@@ -55,7 +55,10 @@ async function login(event) {
   const password = document.getElementById("loginPassword").value;
 
   try {
-    const data = await apiPost("/api/login", { email, password });
+    const data = await apiPost(`${window.CONFIG.API_BASE_URL}/login`, {
+      email,
+      password,
+    });
     if (data.access_token) {
       // Store token and expiry time
       localStorage.setItem("authToken", data.access_token);
@@ -120,7 +123,7 @@ async function loadUserData() {
   if (!authToken) return;
 
   try {
-    const data = await apiGet("/api/users/me");
+    const data = await apiGet(`${window.CONFIG.API_BASE_URL}/api/users/me`);
     currentUser = data;
 
     if (data.prelim_score) {

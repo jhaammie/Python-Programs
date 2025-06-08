@@ -21,7 +21,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Fetch data for all selected schools
   const schoolData = await Promise.all(
     selectedSchools.map((school) =>
-      apiGet(`/api/school-details/${encodeURIComponent(school)}`)
+      apiGet(
+        `${window.CONFIG.API_BASE_URL}/school-details/${encodeURIComponent(
+          school
+        )}`
+      )
     )
   );
 
