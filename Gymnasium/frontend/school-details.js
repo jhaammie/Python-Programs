@@ -95,7 +95,7 @@ function createProgramCharts(programData, programCode, programName) {
       datasets: [
         {
           label: "Preliminär merit",
-          data: programData.map((d) => d.PreliminaryMerit ?? 0),
+          data: programData.map((d) => d.Antagningsgrans_prelim ?? 0),
           borderColor: "#4e73df",
           backgroundColor: "rgba(78, 115, 223, 0.1)",
           borderWidth: 2,
@@ -103,7 +103,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Preliminär median",
-          data: programData.map((d) => d.PreliminaryMedian ?? 0),
+          data: programData.map((d) => d.Median_prelim ?? 0),
           borderColor: "#4e73df",
           backgroundColor: "rgba(78, 115, 223, 0.1)",
           borderWidth: 2,
@@ -112,7 +112,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Slutlig merit",
-          data: programData.map((d) => d.FinalMerit ?? 0),
+          data: programData.map((d) => d.Antagningsgrans_final ?? 0),
           borderColor: "#1cc88a",
           backgroundColor: "rgba(28, 200, 138, 0.1)",
           borderWidth: 2,
@@ -120,7 +120,7 @@ function createProgramCharts(programData, programCode, programName) {
         },
         {
           label: "Slutlig median",
-          data: programData.map((d) => d.FinalMedian ?? 0),
+          data: programData.map((d) => d.Median_final ?? 0),
           borderColor: "#1cc88a",
           backgroundColor: "rgba(28, 200, 138, 0.1)",
           borderWidth: 2,
