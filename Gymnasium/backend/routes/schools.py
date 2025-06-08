@@ -12,23 +12,23 @@ class SchoolBase(BaseModel):
     Year: int
     Kommun: str
     Name: str
-    Organisitionsform: str
+    Organisitionsform: Optional[str] = None
     Studievagskod: str
     Studievag: str
-    Antagningsgrans_prelim: float
-    Antagningsgrans_final: float
-    Median_prelim: float
-    Median_final: float
-    Antal_platser_prelim: int
-    Antal_platser_final: int
-    Antagna_prelim: int
-    Antagna_final: int
-    Reserver_prelim: int
-    Reserver_final: int
-    Lediga_platser_prelim: int
-    Lediga_platser_final: int
-    grans_diff: float
-    median_diff: float
+    Antagningsgrans_prelim: Optional[float] = None
+    Antagningsgrans_final: Optional[float] = None
+    Median_prelim: Optional[float] = None
+    Median_final: Optional[float] = None
+    Antal_platser_prelim: Optional[int] = None
+    Antal_platser_final: Optional[int] = None
+    Antagna_prelim: Optional[int] = None
+    Antagna_final: Optional[int] = None
+    Reserver_prelim: Optional[int] = None
+    Reserver_final: Optional[int] = None
+    Lediga_platser_prelim: Optional[int] = None
+    Lediga_platser_final: Optional[int] = None
+    grans_diff: Optional[float] = None
+    median_diff: Optional[float] = None
 
 class PaginatedResponse(BaseModel):
     data: List[SchoolBase]
