@@ -33,10 +33,10 @@ async def get_current_user_info(current_user: UUID = Depends(get_current_user)):
     return {
         "id": UUID(user[0]),
         "email": user[1],
-        "first_name": user[3],
-        "last_name": user[4],
-        "created_at": user[5],
-        "updated_at": user[6]
+        "first_name": user[2],
+        "last_name": user[3],
+        "created_at": user[4],
+        "updated_at": user[5]
     }
 
 @router.put("/users/me", response_model=UserResponse)
@@ -54,8 +54,8 @@ async def update_user_info(
         str(current_user),
         user_update.email or user[1],
         user_update.password,
-        user_update.first_name or user[3],
-        user_update.last_name or user[4],
+        user_update.first_name or user[2],
+        user_update.last_name or user[3],
         updated_at
     )
     
@@ -67,8 +67,8 @@ async def update_user_info(
     return {
         "id": UUID(updated_user[0]),
         "email": updated_user[1],
-        "first_name": updated_user[3],
-        "last_name": updated_user[4],
-        "created_at": updated_user[5],
-        "updated_at": updated_user[6]
+        "first_name": updated_user[2],
+        "last_name": updated_user[3],
+        "created_at": updated_user[4],
+        "updated_at": updated_user[5]
     } 
