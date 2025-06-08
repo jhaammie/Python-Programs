@@ -37,7 +37,7 @@ def CreateUser(user_id: str, email: str, password: str, first_name: str, last_na
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO users (id, email, password, first_name, last_name, created_at, updated_at)
+                INSERT INTO users (id, email, password_hash, first_name, last_name, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING id
             """, (user_id, email, password, first_name, last_name, created_at, created_at))
@@ -56,7 +56,7 @@ def GetUserByEmail(email: str) -> Optional[Tuple[Any, ...]]:
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT id, email, password, first_name, last_name, created_at, updated_at
+                SELECT id, email, first_name, last_name, created_at, updated_at
                 FROM users
                 WHERE email = %s
             """, (email,))
@@ -70,7 +70,7 @@ def GetUserById(user_id: str) -> Optional[Tuple[Any, ...]]:
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT id, email, password, first_name, last_name, created_at, updated_at
+                SELECT id, email, first_name, last_name, created_at, updated_at
                 FROM users
                 WHERE id = %s
             """, (user_id,))
@@ -86,7 +86,7 @@ def UpdateUser(user_id: str, email: str, password: Optional[str], first_name: st
             if password:
                 cur.execute("""
                     UPDATE users
-                    SET email = %s, password = %s, first_name = %s, last_name = %s, updated_at = %s
+                    SET email = %s, password_hash = %s, first_name = %s, last_name = %s, updated_at = %s
                     WHERE id = %s
                 """, (email, password, first_name, last_name, updated_at, user_id))
             else:
