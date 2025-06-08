@@ -258,7 +258,6 @@ def GetGymnasiumWithinRadius(latitude, longitude, radius, page_number, page_size
     offset = page_number * page_size
     data = []
     total_count = 0
-    radius = 8000
     try:
         count_query = f"""
             SELECT COUNT(*) 

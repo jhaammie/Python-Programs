@@ -293,7 +293,6 @@ async function fetchSchoolDetails() {
 
     // Update Google Maps link
     const locationLink = document.getElementById("locationLink");
-    alert(data.location);
     if (data.location && data.location.latitude && data.location.longitude) {
       locationLink.href = `https://www.google.com/maps?q=${data.location.latitude},${data.location.longitude}`;
     } else {
