@@ -8,6 +8,7 @@ import yaml
 from typing import Optional, Tuple
 from uuid import UUID, uuid4
 from hoohoohee import CreateUser, GetUserByEmail
+from config import JWT_SECRET, JWT_EXPIRATION
 
 # Load JWT config
 with open('config.yml', 'r') as f:
@@ -54,20 +55,28 @@ def create_access_token(user_id: UUID) -> Tuple[str, datetime]:
     return jwt.encode(payload, JWT_SECRET, algorithm='HS256'), expires_at
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> UUID:
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
         user_id: str = payload.get('user_id')
         if user_id is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-        return UUID(user_id)
-    except (jwt.JWTError, ValueError):
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+            raise credentials_exception
+        token_data = TokenData(user_id=UUID(user_id))
+    except (jwt.InvalidTokenError, ValueError):
+        raise credentials_exception
+    return token_data.user_id
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate):
-    # Check if user exists
-    existing_user = GetUserByEmail(user.email)
-    if existing_user:
+    # Check if user already exists
+    if GetUserByEmail(user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Hash password
@@ -76,7 +85,17 @@ async def register(user: UserCreate):
     # Create user with UUID
     user_id = uuid4()
     created_at = datetime.now(timezone.utc)
-    CreateUser(str(user_id), user.email, hashed_password.decode('utf-8'), user.first_name, user.last_name, created_at)
+    success = CreateUser(
+        str(user_id),
+        user.email,
+        hashed_password.decode('utf-8'),
+        user.first_name,
+        user.last_name,
+        created_at
+    )
+    
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to create user")
     
     # Generate token
     access_token, expires_at = create_access_token(user_id)
@@ -96,15 +115,13 @@ async def register(user: UserCreate):
     }
 
 @router.post("/login", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    # Get user
-    user = GetUserByEmail(form_data.username)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+async def login(user: UserLogin):
+    db_user = GetUserByEmail(user.email)
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
     
-    # Verify password
-    if not bcrypt.checkpw(form_data.password.encode('utf-8'), user[2].encode('utf-8')):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+    if not verify_password(user.password, db_user[2]):  # db_user[2] is password_hash
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
     
     # Generate token
     access_token, expires_at = create_access_token(UUID(user[0]))
