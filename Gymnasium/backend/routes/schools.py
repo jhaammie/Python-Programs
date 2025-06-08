@@ -1,12 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Tuple
 from hoohoohee import GetSchoolHistoricalData, GetSchoolLocation, GetGymnasiumWithinRadius, GetDataForSchools, PredictSchoolsWithinRadius
 from .auth import get_current_user
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from datetime import datetime
 
 router = APIRouter()
+
+# Cache for school locations
+school_location_cache: Dict[str, Tuple[float, float]] = {}
 
 class SchoolBase(BaseModel):
     Year: int
@@ -68,11 +72,21 @@ class LocationRequest(BaseModel):
 class PredictionRequest(BaseModel):
     latitude: float
     longitude: float
-    radius: int = Field(ge=1, le=20)
+    radius: float
     prelim_score: float
 
 class SchoolNameRequest(BaseModel):
     school_name: str
+
+def get_school_location(school_name: str) -> Optional[Tuple[float, float]]:
+    """Get school location from cache or database."""
+    if school_name in school_location_cache:
+        return school_location_cache[school_name]
+    
+    location = GetSchoolLocation(school_name)
+    if location:
+        school_location_cache[school_name] = location
+    return location
 
 @router.post("/school-details", response_model=SchoolDetails)
 async def get_school_details(request: SchoolNameRequest):
@@ -188,70 +202,102 @@ async def get_regression_predictions(location: PredictionRequest):
         historical_data = GetSchoolHistoricalData(school_name)
         
         if len(historical_data) > 1:  # Need at least 2 points for regression
-            # Extract prelim scores, final scores, and program codes, filtering out None/NaN values
-            prelim_scores = []
-            final_scores = []
-            program_codes = []
+            # Group data by program code
+            program_data = {}
             for row in historical_data:
                 if row[2] is not None and row[3] is not None:  # Check for None values in prelim and final scores
-                    prelim_scores.append(row[2])  # antagningsgräns_prelim
-                    final_scores.append(row[3])   # antagningsgräns_final
-                    program_codes.append(row[16])  # studievägskod
+                    program_code = str(row[16])  # studievägskod
+                    if program_code not in program_data:
+                        program_data[program_code] = {
+                            'prelim_scores': [],
+                            'final_scores': [],
+                            'years': []
+                        }
+                    program_data[program_code]['prelim_scores'].append(float(row[2]))  # antagningsgräns_prelim
+                    program_data[program_code]['final_scores'].append(float(row[3]))   # antagningsgräns_final
+                    program_data[program_code]['years'].append(row[0])  # år
             
-            if len(prelim_scores) > 1:  # Need at least 2 valid points for regression
-                # Create feature matrix with prelim scores and program codes
-                X = np.column_stack((
-                    np.array(prelim_scores).reshape(-1, 1),
-                    np.array(program_codes).reshape(-1, 1)
-                ))
-                y = np.array(final_scores)
-                
-                # Skip if any NaN values
-                if not np.isnan(X).any() and not np.isnan(y).any():
-                    model = LinearRegression()
-                    model.fit(X, y)
+            # Make predictions for each program
+            for program_code, data in program_data.items():
+                if len(data['prelim_scores']) > 1:  # Need at least 2 valid points for regression
+                    # Create feature matrix with prelim scores
+                    X = np.array(data['prelim_scores']).reshape(-1, 1)
+                    y = np.array(data['final_scores'])
                     
-                    # Predict final score using both prelim score and program code
-                    current_program_code = historical_data[0][16]  # Use most recent program code
-                    predicted_final = model.predict([[
-                        location.prelim_score,
-                        current_program_code
-                    ]])[0]
-                    
-                    # Get school location
-                    school_location = GetSchoolLocation(school_name)
-                    if school_location:
-                        # Calculate median difference
-                        median_prelim = historical_data[0][4]  # median_prelim
-                        median_final = historical_data[0][5]   # median_final
-                        median_diff = median_final - median_prelim if median_prelim is not None and median_final is not None else None
+                    # Skip if any NaN values
+                    if not np.isnan(X).any() and not np.isnan(y).any():
+                        model = LinearRegression()
+                        model.fit(X, y)
                         
-                        predictions.append({
-                            "Year": historical_data[0][0],  # år
-                            "Kommun": historical_data[0][15],  # kommun
-                            "Name": school_name,
-                            "Organisitionsform": historical_data[0][14],  # organistionsform
-                            "Studievagskod": historical_data[0][16],  # studievägskod
-                            "Studievag": historical_data[0][1],  # studieväg
-                            "Antagningsgrans_prelim": location.prelim_score,
-                            "Antagningsgrans_final": predicted_final,
-                            "Median_prelim": median_prelim,
-                            "Median_final": median_final,
-                            "Antal_platser_prelim": historical_data[0][6],  # antal_platser_prelim
-                            "Antal_platser_final": historical_data[0][7],   # antal_platser_final
-                            "Antagna_prelim": historical_data[0][8],        # antagna_prelim
-                            "Antagna_final": historical_data[0][9],         # antagna_final
-                            "Reserver_prelim": historical_data[0][10],      # reserver_prelim
-                            "Reserver_final": historical_data[0][11],       # reserver_final
-                            "Lediga_platser_prelim": historical_data[0][12], # lediga_platser_prelim
-                            "Lediga_platser_final": historical_data[0][13],  # lediga_platser_final
-                            "grans_diff": predicted_final - location.prelim_score,
-                            "median_diff": median_diff,
-                            "latitude": school_location[0],
-                            "longitude": school_location[1],
-                            "distance": round(school[1], 1)  # Distance is already calculated by GetGymnasiumWithinRadius
-                        })
+                        # Predict final score using prelim score
+                        predicted_final = model.predict([[float(location.prelim_score)]])[0]
+                        
+                        # Calculate confidence level based on:
+                        # 1. Number of data points
+                        # 2. Recency of data
+                        # 3. Variance in historical data
+                        num_data_points = len(data['prelim_scores'])
+                        max_year = max(data['years'])
+                        current_year = datetime.now().year
+                        year_diff = current_year - max_year
+                        
+                        # Calculate variance in historical data
+                        prelim_variance = np.var(data['prelim_scores'])
+                        final_variance = np.var(data['final_scores'])
+                        
+                        # Calculate confidence score (0-100)
+                        data_points_score = min(100, num_data_points * 20)  # 5 points = 100% confidence
+                        recency_score = max(0, 100 - (year_diff * 20))  # -20% per year
+                        variance_score = max(0, 100 - (prelim_variance + final_variance) * 10)  # -10% per unit of variance
+                        
+                        confidence = (data_points_score + recency_score + variance_score) / 3
+                        
+                        # Calculate probability of getting in
+                        # Based on how many historical final scores were below the predicted score
+                        historical_final_scores = np.array(data['final_scores'])
+                        probability = np.mean(historical_final_scores >= predicted_final) * 100
+                        
+                        # Get school location from cache or database
+                        school_location = get_school_location(school_name)
+                        if school_location:
+                            # Find the most recent data for this program
+                            program_rows = [row for row in historical_data if str(row[16]) == program_code]
+                            if program_rows:
+                                latest_data = program_rows[0]  # Most recent data for this program
+                                
+                                # Calculate median difference
+                                median_prelim = latest_data[4]  # median_prelim
+                                median_final = latest_data[5]   # median_final
+                                median_diff = median_final - median_prelim if median_prelim is not None and median_final is not None else None
+                                
+                                predictions.append({
+                                    "Year": latest_data[0],  # år
+                                    "Kommun": latest_data[15],  # kommun
+                                    "Name": school_name,
+                                    "Organisitionsform": latest_data[14],  # organistionsform
+                                    "Studievagskod": program_code,  # studievägskod
+                                    "Studievag": latest_data[1],  # studieväg
+                                    "Antagningsgrans_prelim": location.prelim_score,
+                                    "Antagningsgrans_final": predicted_final,
+                                    "Median_prelim": median_prelim,
+                                    "Median_final": median_final,
+                                    "Antal_platser_prelim": latest_data[6],  # antal_platser_prelim
+                                    "Antal_platser_final": latest_data[7],   # antal_platser_final
+                                    "Antagna_prelim": latest_data[8],        # antagna_prelim
+                                    "Antagna_final": latest_data[9],         # antagna_final
+                                    "Reserver_prelim": latest_data[10],      # reserver_prelim
+                                    "Reserver_final": latest_data[11],       # reserver_final
+                                    "Lediga_platser_prelim": latest_data[12], # lediga_platser_prelim
+                                    "Lediga_platser_final": latest_data[13],  # lediga_platser_final
+                                    "grans_diff": predicted_final - location.prelim_score,
+                                    "median_diff": median_diff,
+                                    "latitude": school_location[0],
+                                    "longitude": school_location[1],
+                                    "distance": round(school[1], 1),  # Distance is already calculated by GetGymnasiumWithinRadius
+                                    "confidence": round(confidence, 1),  # Confidence level (0-100)
+                                    "probability": round(probability, 1)  # Probability of getting in (0-100)
+                                })
     
-    # Sort by distance
-    predictions.sort(key=lambda x: x["distance"])
-    return predictions
+    # Sort by probability and confidence, then take top 25
+    predictions.sort(key=lambda x: (x["probability"], x["confidence"]), reverse=True)
+    return predictions[:25]
