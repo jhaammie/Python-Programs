@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5006:5006"
-    container_name: backend_app
+    container_name: gymnasium_backend
     volumes: []
     depends_on:
       - db
@@ -13,7 +13,7 @@ services:
 
   db:
     image: postgis/postgis:15-3.4
-    container_name: postgres_db
+    container_name: gymnasium_db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -24,7 +24,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: nginx_static
+    container_name: gymnasium_frontend
     environment:
       - API_BASE_URL=https://gymnasium.edigistay.com
     volumes:

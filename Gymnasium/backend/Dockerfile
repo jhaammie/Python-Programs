@@ -31,5 +31,5 @@ COPY . .
 # Expose FastAPI port
 EXPOSE 5006
 
-# Run with Uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5006"]
+# Run with Gunicorn and uvicorn workers
+CMD ["gunicorn", "app:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:5006"]
