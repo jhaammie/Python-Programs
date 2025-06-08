@@ -1,22 +1,35 @@
-# Use the official Python image as the base image
-FROM python:3.11-slim
+# === Build Stage ===
+FROM python:3.11-slim AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Create and activate virtual environment
+# Install build dependencies (optional but good if you have wheels, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up virtual environment in build stage
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
-# Copy the requirements file first to leverage Docker cache
+# Copy only requirements first to cache layers
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# === Final Stage ===
+FROM python:3.11-slim AS final
+
+WORKDIR /app
+
+# Copy virtual environment from build stage
+COPY --from=builder /app/venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Copy app source
 COPY . .
 
-# Expose port 5006 for the fast api app
+# Expose FastAPI port
 EXPOSE 5006
 
-# Run the Flask app using Uvicorn
+# Run with Uvicorn
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5006"]

@@ -6,10 +6,7 @@ services:
     ports:
       - "5006:5006"
     container_name: backend_app
-    volumes:
-      - ./backend:/app
-      - /app/venv
-      - /usr/local/lib/python3.11/site-packages
+    volumes: []
     depends_on:
       - db
     restart: always
