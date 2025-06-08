@@ -170,7 +170,10 @@ async function saveUserData() {
   };
 
   try {
-    const updatedUser = await apiPut("/users/me", userData);
+    const updatedUser = await apiPut(
+      `${window.CONFIG.API_BASE_URL}/users/me`,
+      userData
+    );
     localStorage.setItem("userEmail", updatedUser.email);
     localStorage.setItem("userFirstName", updatedUser.first_name);
     localStorage.setItem("userLastName", updatedUser.last_name);

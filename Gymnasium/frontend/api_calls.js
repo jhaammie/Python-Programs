@@ -86,13 +86,13 @@ function handleAuthExpiry() {
   }
 }
 
-async function apiPut(endpoint, data) {
+async function apiPut(url, data) {
   const token = localStorage.getItem("token");
   if (!token) {
     throw new Error("No authentication token found");
   }
 
-  const response = await fetch(`/api${endpoint}`, {
+  const response = await fetch(url, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
