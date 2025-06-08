@@ -298,6 +298,11 @@ async def get_regression_predictions(location: PredictionRequest):
                                     "probability": round(probability, 1)  # Probability of getting in (0-100)
                                 })
     
-    # Sort by probability and confidence, then take top 25
-    predictions.sort(key=lambda x: (x["probability"], x["confidence"]), reverse=True)
+    # Sort by Antal_platser_final, Lediga_platser_final, probability, and confidence (all descending)
+    predictions.sort(key=lambda x: (
+        -(x["Antal_platser_final"] or 0),
+        -(x["Lediga_platser_final"] or 0),
+        -(x["probability"] or 0),
+        -(x["confidence"] or 0)
+    ))
     return predictions[:25]

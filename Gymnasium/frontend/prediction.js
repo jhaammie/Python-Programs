@@ -63,22 +63,34 @@ function getConfidenceLevel(scoreDiff, availablePlaces) {
 }
 
 function displayPredictions(predictions) {
+  console.log("Displaying predictions:", predictions);
+
   const container = document.getElementById("predictionsContainer");
-  if (!container) return;
+  console.log("Container found:", container);
+
+  if (!container) {
+    console.error("Predictions container not found!");
+    return;
+  }
 
   container.innerHTML = "";
 
   if (!predictions || predictions.length === 0) {
+    console.log("No predictions to display");
     container.innerHTML =
       "<p class='text-center'>Inga skolor hittades inom det angivna avståndet</p>";
     return;
   }
 
+  console.log("Number of predictions:", predictions.length);
+
   // Create a row for the cards
   const row = document.createElement("div");
   row.className = "row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4";
 
-  predictions.forEach((pred) => {
+  predictions.forEach((pred, index) => {
+    console.log(`Processing prediction ${index}:`, pred);
+
     const col = document.createElement("div");
     col.className = "col";
 
@@ -108,7 +120,7 @@ function displayPredictions(predictions) {
       probabilityColor = "text-warning";
     }
 
-    card.innerHTML = `
+    const cardContent = `
       <div class="card-body">
         <h5 class="card-title">${pred.Name}</h5>
         <h6 class="card-subtitle mb-2 text-muted">${pred.Kommun}</h6>
@@ -134,9 +146,13 @@ function displayPredictions(predictions) {
       </div>
     `;
 
+    console.log(`Card content for ${index}:`, cardContent);
+
+    card.innerHTML = cardContent;
     col.appendChild(card);
     row.appendChild(col);
   });
 
   container.appendChild(row);
+  console.log("Predictions display completed");
 }
