@@ -66,19 +66,23 @@ function displayPredictions(predictions) {
   console.log("Displaying predictions:", predictions);
 
   const container = document.getElementById("predictionsContainer");
+  const predictionsList = document.getElementById("predictionsList");
   console.log("Container found:", container);
+  console.log("PredictionsList found:", predictionsList);
 
-  if (!container) {
-    console.error("Predictions container not found!");
+  if (!container || !predictionsList) {
+    console.error("Required containers not found!");
     return;
   }
 
-  container.innerHTML = "";
+  // Clear existing content
+  predictionsList.innerHTML = "";
 
   if (!predictions || predictions.length === 0) {
     console.log("No predictions to display");
-    container.innerHTML =
+    predictionsList.innerHTML =
       "<p class='text-center'>Inga skolor hittades inom det angivna avståndet</p>";
+    container.style.display = "block";
     return;
   }
 
@@ -126,18 +130,12 @@ function displayPredictions(predictions) {
         <h6 class="card-subtitle mb-3 text-muted">${pred.Kommun}</h6>
         <div class="card-text">
           <div class="mb-2">
+            <strong>Studievägskod:</strong><br>
+            <span class="text-muted">${pred.Studievagskod}</span>
+          </div>
+          <div class="mb-2">
             <strong>Studieväg:</strong><br>
             <span class="text-muted">${pred.Studievag}</span>
-          </div>
-          <div class="row mb-2">
-            <div class="col-6">
-              <strong>Prelim merit:</strong><br>
-              <span>${pred.Antagningsgrans_prelim?.toFixed(1) || "N/A"}</span>
-            </div>
-            <div class="col-6">
-              <strong>Predikterad final merit:</strong><br>
-              <span>${pred.Antagningsgrans_final?.toFixed(1) || "N/A"}</span>
-            </div>
           </div>
           <div class="row mb-2">
             <div class="col-6">
@@ -155,19 +153,6 @@ function displayPredictions(predictions) {
           </div>
         </div>
       </div>
-      <div class="card-footer bg-light">
-        <small class="text-muted">
-          <div class="row">
-            <div class="col-4">Platser: ${
-              pred.Antal_platser_final || "N/A"
-            }</div>
-            <div class="col-4">Antagna: ${pred.Antagna_final || "N/A"}</div>
-            <div class="col-4">Lediga: ${
-              pred.Lediga_platser_final || "N/A"
-            }</div>
-          </div>
-        </small>
-      </div>
     `;
 
     console.log(`Card content for ${index}:`, cardContent);
@@ -177,6 +162,7 @@ function displayPredictions(predictions) {
     row.appendChild(col);
   });
 
-  container.appendChild(row);
+  predictionsList.appendChild(row);
+  container.style.display = "block";
   console.log("Predictions display completed");
 }
