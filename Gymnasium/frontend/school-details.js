@@ -279,7 +279,7 @@ async function fetchSchoolDetails() {
     document.getElementById("programSections").innerHTML = "";
     destroyAllCharts();
 
-    const data = await apiPost("/api/school-details", {
+    const data = await apiPost(`${window.CONFIG.API_BASE_URL}/school-details`, {
       school_name: schoolName,
     });
     const school = data.historical_data[0];

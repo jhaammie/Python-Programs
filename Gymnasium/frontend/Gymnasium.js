@@ -34,19 +34,27 @@ async function getNearestGymnasium(latitude, longitude) {
 }
 
 async function getGymnasiumWithInRadius() {
-  const radius = document.getElementById("radius").value;
+  const radius = parseFloat(document.getElementById("radius").value);
   const sortBy = document.getElementById("sortBy").value;
   const sortOrder = document.querySelector(
     'input[name="SortOrder"]:checked'
   ).value;
-  const minpreMerit = document.getElementById("minPrelimMerit").value;
-  const maxpreMerit = document.getElementById("maxPrelimMerit").value;
-  const minfinMerit = document.getElementById("minFinalMerit").value;
-  const maxfinMerit = document.getElementById("maxFinalMerit").value;
+  const minpreMerit = parseFloat(
+    document.getElementById("minPrelimMerit").value
+  );
+  const maxpreMerit = parseFloat(
+    document.getElementById("maxPrelimMerit").value
+  );
+  const minfinMerit = parseFloat(
+    document.getElementById("minFinalMerit").value
+  );
+  const maxfinMerit = parseFloat(
+    document.getElementById("maxFinalMerit").value
+  );
   const programs = Array.from(
     document.getElementById("program").selectedOptions
   ).map((option) => option.value);
-  const year = document.getElementById("year").value;
+  const year = parseInt(document.getElementById("year").value);
 
   try {
     const position = await new Promise((resolve, reject) => {
@@ -145,6 +153,21 @@ function renderGymnasiumData(data) {
                   <td>Platser</td>
                   <td>${formatValue(data[i].Antal_platser_final)}</td>
                   <td>${formatValue(data[i].Antal_platser_prelim)}</td>
+                </tr>
+                <tr>
+                  <td>Antagna</td>
+                  <td>${formatValue(data[i].Antagna_final)}</td>
+                  <td>${formatValue(data[i].Antagna_prelim)}</td>
+                </tr>
+                <tr>
+                  <td>Reserver</td>
+                  <td>${formatValue(data[i].Reserver_final)}</td>
+                  <td>${formatValue(data[i].Reserver_prelim)}</td>
+                </tr>
+                <tr>
+                  <td>Lediga platser</td>
+                  <td>${formatValue(data[i].Lediga_platser_final)}</td>
+                  <td>${formatValue(data[i].Lediga_platser_prelim)}</td>
                 </tr>
               </tbody>
             </table>

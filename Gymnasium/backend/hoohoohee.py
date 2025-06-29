@@ -1,9 +1,10 @@
-import os
 import yaml
 from datetime import datetime
-from typing import Optional, Tuple, List, Any
+from typing import Optional, Tuple, Any
 
 import psycopg2
+
+from utils import slugify
 
 # ============= Database Configuration =============
 with open('config.yml', 'r') as f:
@@ -147,7 +148,7 @@ def GetListOfSchoolNames(pagenumber, pagesize):
     data = []
     offset = pagenumber*pagesize
     try:
-        query = f"select distinct skola from gymnasium where skola not in (select distinct name from school) order by skola limit {pagesize} offset {offset}"
+        query = f"select distinct skola from gymnasium_prelim_final where skola_slug not in (select distinct slug from school) order by skola limit {pagesize} offset {offset}"
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)
@@ -163,8 +164,8 @@ def InsertSchool(schoolname, latitude, longitude):
     try:
         connection = __GetdbConn()
         cursor = connection.cursor()
-        sql = "insert into public.school(name, latitude, longitude) values(%s, %s, %s)"
-        val = (schoolname, latitude, longitude)
+        sql = "insert into public.school(name, latitude, longitude, slug) values(%s, %s, %s, %s)"
+        val = (schoolname, latitude, longitude, slugify(schoolname))
         cursor.execute(sql, val)
         connection.commit()
         connection.close()
@@ -175,7 +176,7 @@ def GetCountOfDistinctSchools():
     """Get count of distinct schools not yet in the school table."""
     data = 0
     try:
-        query = "select count(distinct skola) from gymnasium where skola not in (select distinct name from school)"
+        query = "select count(distinct skola_slug) from gymnasium_prelim_final where skola_slug not in (select distinct slug from school)"
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)
@@ -230,7 +231,31 @@ def GetDataForSchools(lst, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxp
         programs = []
     placeholders = ",".join(f"'{name}'" for name in lst)
     data = []
-    query = f"select * from prelim_final_gymnasium where skola in ({placeholders})"
+    query = f"""
+        SELECT 
+            år,
+            studieväg,
+            antagningsgräns_prelim,
+            antagningsgräns_final,
+            median_prelim,
+            median_final,
+            antal_platser_prelim,
+            antal_platser_final,
+            antagna_prelim,
+            antagna_final,
+            reserver_prelim,
+            reserver_final,
+            lediga_platser_prelim,
+            lediga_platser_final,
+            organistionsform,
+            kommun, 
+            studievägskod,
+            gräns_diff,
+            median_diff,
+            skola
+        FROM gymnasium_prelim_final 
+        WHERE skola in ({placeholders})
+    """
     try:
         if programs is not None:
             joined_str = "|".join(programs)
@@ -323,7 +348,7 @@ def GetSchoolHistoricalData(school_name):
                 studievägskod,
                 gräns_diff,
                 median_diff
-            FROM prelim_final_gymnasium 
+            FROM gymnasium_prelim_final 
             WHERE skola = %s
             ORDER BY år DESC, studieväg;
         """
@@ -364,7 +389,7 @@ def PredictSchools(prelim_score, year=None):
                         PARTITION BY skola, studieväg 
                         ORDER BY år DESC
                     ) as rn
-                FROM prelim_final_gymnasium
+                FROM gymnasium_prelim_final
                 WHERE antagningsgräns_prelim <= %s
         """
         params = [prelim_score]
@@ -424,7 +449,7 @@ def PredictSchoolsWithinRadius(prelim_score, latitude, longitude, radius):
                         PARTITION BY p.skola, p.studieväg 
                         ORDER BY p.år DESC
                     ) as rn
-                FROM prelim_final_gymnasium p
+                FROM gymnasium_prelim_final p
                 JOIN school s ON p.skola = s.name
                 WHERE p.antagningsgräns_prelim <= %s
                 AND ST_DistanceSphere(
@@ -451,7 +476,3 @@ def PredictSchoolsWithinRadius(prelim_score, latitude, longitude, radius):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     return data
-
-"""print(GetListOfSchoolNames(0, 2))
-print(InsertSchool("S:t Botvids Gymnasium", "33.8", "88.99"))
-"""

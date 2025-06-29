@@ -153,26 +153,26 @@ async def get_nearby_schools(location: LocationRequest):
     result = []
     for school in data_list:
         d = {
-            "Year": school[0],
-            "Kommun": school[1],
-            "Name": school[2],
-            "Organisitionsform": school[3],
-            "Studievagskod": school[4],
-            "Studievag": school[5],
-            "Antagningsgrans_prelim": school[6],
-            "Antagningsgrans_final": school[7],
-            "Median_prelim": school[8],
-            "Median_final": school[9],
-            "Antal_platser_prelim": school[10],
-            "Antal_platser_final": school[11],
-            "Antagna_prelim": school[12],
-            "Antagna_final": school[13],
-            "Reserver_prelim": school[14],
-            "Reserver_final": school[15],
-            "Lediga_platser_prelim": school[16],
-            "Lediga_platser_final": school[17],
-            "grans_diff": school[18],
-            "median_diff": school[19]
+            "Year": school[0],              # år
+            "Studievag": school[1],         # studieväg
+            "Antagningsgrans_prelim": school[2],    # antagningsgräns_prelim
+            "Antagningsgrans_final": school[3],     # antagningsgräns_final
+            "Median_prelim": school[4],             # median_prelim
+            "Median_final": school[5],              # median_final
+            "Antal_platser_prelim": school[6],      # antal_platser_prelim
+            "Antal_platser_final": school[7],       # antal_platser_final
+            "Antagna_prelim": school[8],            # antagna_prelim
+            "Antagna_final": school[9],             # antagna_final
+            "Reserver_prelim": school[10],          # reserver_prelim
+            "Reserver_final": school[11],           # reserver_final
+            "Lediga_platser_prelim": school[12],    # lediga_platser_prelim
+            "Lediga_platser_final": school[13],     # lediga_platser_final
+            "Organisitionsform": school[14],        # organistionsform
+            "Kommun": school[15],                   # kommun
+            "Studievagskod": school[16],            # studievägskod
+            "grans_diff": school[17],               # gräns_diff
+            "median_diff": school[18],              # median_diff
+            "Name": school[19]                      # skola
         }
         result.append(d)
     

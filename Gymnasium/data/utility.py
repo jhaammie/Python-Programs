@@ -19,7 +19,7 @@ def slug(text):
     # Convert to lowercase and normalize unicode characters
     text = unicodedata.normalize('NFKD', text.lower())
     # Remove non-alphanumeric characters and replace spaces with hyphens
-    text = re.sub(r'[^a-z0-9\s-]', '', text)
+    text = re.sub(r'[^a-z0-9\s-]', '-', text)
     # Replace multiple spaces or hyphens with single hyphen
     text = re.sub(r'[\s-]+', '-', text)
     # Remove leading/trailing hyphens

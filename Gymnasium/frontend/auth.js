@@ -85,7 +85,7 @@ async function register(event) {
   const lastName = document.getElementById("registerLastName").value;
 
   try {
-    const data = await apiPost("/api/register", {
+    const data = await apiPost(`${window.CONFIG.API_BASE_URL}/register`, {
       email,
       password,
       first_name: firstName,
