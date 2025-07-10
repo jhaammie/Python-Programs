@@ -17,7 +17,7 @@ def insert_data_from_excel():
         "host":os.getenv("HOST")
     }
 
-    FOLDER_PATH = os.getcwd()  # Path where your Excel files are stored
+    FOLDER_PATH = os.getcwd()  # Path where file is running from
     if not FOLDER_PATH.endswith('data'):
         FOLDER_PATH = os.path.join(FOLDER_PATH, 'data')
 
@@ -106,7 +106,7 @@ def insert_data_from_excel():
                 if data['antal_platser'] == 'P':
                     print(f"⚠️ Skipping row with P in 'antal_platser' in file '{file_path}'")
                     continue
-                cur.execute(insert_query, data)
+                # cur.execute(insert_query, data)
             except psycopg2.Error as e:
                 print(f"❌ Error inserting data from file '{file_path}': {row}, Error: {e}")
                 break

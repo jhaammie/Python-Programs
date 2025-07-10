@@ -1,3 +1,5 @@
+ let currentpage = 0
+ const pagesize = 12
    function getLocation(callback) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -24,6 +26,16 @@
         .catch(error => console.error("Error:", error));
     }
 
+    function previouspage(){
+        if (currentpage>0){
+            currentpage = currentpage-1
+            getLocation(getGymnasiumWithInRadius)
+        }
+    }
+    function nextpage(){
+         currentpage = currentpage+1
+         getLocation(getGymnasiumWithInRadius)
+    }
     function getGymnasiumWithInRadius(latitude, longitude) {
       const radius = document.getElementById("radius").value;
       if (radius <= 0 || radius > 1573) {
@@ -59,7 +71,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ latitude, longitude, radius, sortBy,
         sortOrder: selectedSortOrder, minpreMerit, maxpreMerit,
-        programs: selectedPrograms, year, minfinMerit, maxfinMerit})
+        programs: selectedPrograms, year, minfinMerit, maxfinMerit, pageno:currentpage, pagesize})
       })
         .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
         .then(renderGymnasiumData)

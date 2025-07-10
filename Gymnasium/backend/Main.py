@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
-from hoohoohee import GetNearestSchools, GetDataForSchools, GetGymnasiumWithinRadius
+from hoohoohee import GetNearestSchools, GetDataForSchools, GetPaginatedDataForSchools
 
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)
@@ -55,6 +55,7 @@ def GetNearestGymnasium():
 
 @app.route('/gymnasium-within-radius', methods=["POST"])
 def GymnasiumWithinRadius():
+
     content = request.json
     a = content["latitude"]
     b = content["longitude"]
@@ -67,19 +68,10 @@ def GymnasiumWithinRadius():
     maxfinMerit = content["maxfinMerit"]
     programs = content["programs"]
     year = content["year"]
-    lst = []
-    schools = GetGymnasiumWithinRadius(a, b, radius)
-#    for a in range(0, len(schools)):
- #       PutMeInLst = schools[a][0]
-  #      lst.append(PutMeInLst)
+    pageno = content["pageno"]
+    pagesize = content["pagesize"]
 
-    for school in schools:
-        lst.append(school[0])
-    DataList = GetDataForSchools(lst, sortby, sortOrder, minpreMerit, minfinMerit, maxpreMerit, maxfinMerit, programs, year)
-    if len(DataList) > 0:
-        print(DataList[0])
-
-
+    DataList = GetPaginatedDataForSchools(a, b, radius, pageno, pagesize, sortby, sortOrder, minpreMerit, minfinMerit, maxpreMerit, maxfinMerit, programs, year)
     list = []
     for school in DataList:
         d = {"Year":school[0],

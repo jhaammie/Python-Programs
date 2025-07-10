@@ -1,9 +1,8 @@
 import psycopg2
-from Hahahaha import PopulateLocation
+# from backend.Hahahaha import PopulateLocation
 from data.DataInsertionScript import insert_data_from_excel
 from dotenv import load_dotenv
 import os
-from 
 
 load_dotenv()
 
@@ -113,8 +112,8 @@ def add_postgis_extension():
             print("PostgreSQL connection is closed.")         
 
 if __name__ == "__main__":
-    create_gymnasium_table()
-    create_school_table()
-    add_postgis_extension()
+  #  create_gymnasium_table()
+   # create_school_table()
+    #add_postgis_extension()
     insert_data_from_excel()
     # PopulateLocation()

@@ -90,9 +90,9 @@ def GetNearestSchools(latitude, longitude,count):
 def GetDataForSchools(lst, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000,
                       programs=None, year=None):
 
-    if programs is None:
-        programs = []
+
     placeholders = ",".join(f"'{name}'" for name in lst)
+
     data = []
     query = f"select * from prelim_final_gymnasium where skola in ({placeholders})"
     try:
@@ -122,10 +122,12 @@ def GetDataForSchools(lst, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxp
         # print('Database connection closed.')
     return data
 
-def GetGymnasiumWithinRadius(latitude, longitude, radius):
+def GetGymnasiumWithinRadius(latitude, longitude, radius, pageno, pagesize):
     data = []
     try:
-        query = f"select name, ST_DistanceSphere(ST_MakePoint({longitude}, {latitude}), ST_MakePoint(school.longitude, school.latitude)) / 1000 as distance_in_km from school where ST_DistanceSphere(ST_MakePoint({longitude}, {latitude}), ST_MakePoint(school.longitude, school.latitude)) / 1000 <= {radius} order by distance_in_km asc;"
+        offset = pageno * pagesize
+        query = f"select name, ST_DistanceSphere(ST_MakePoint({longitude}, {latitude}), ST_MakePoint(school.longitude, school.latitude)) / 1000 as distance_in_km from school where ST_DistanceSphere(ST_MakePoint({longitude}, {latitude}), ST_MakePoint(school.longitude, school.latitude)) / 1000 <= {radius} order by distance_in_km asc limit {pagesize} offset {offset};"
+        print("query: ", query)
         connection = __GetdbConn()
         cursor = connection.cursor()
         cursor.execute(query)
@@ -139,6 +141,70 @@ def GetGymnasiumWithinRadius(latitude, longitude, radius):
             connection.close()
         # print('Database connection closed.')
     return data
+
+def GetPaginatedDataForSchools(latitude, longitude, radius, pagenumber, pagesize, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000,
+                      programs=None, year=None):
+    cte = f"""select
+        g.år,
+        g.kommun,
+        s.name,
+        g.organistionsform,
+        g.studievägskod,
+        g.studieväg,
+        g.antagningsgräns_prelim,
+        g.antagningsgräns_final,
+        g.median_prelim,
+        g.median_final,
+        g.antal_platser_prelim,
+        g.antal_platser_final,
+        g.antagna_prelim,
+        g.antagna_final,
+        g.reserver_prelim,
+        g.reserver_final,
+        g.lediga_platser_prelim,
+        g.lediga_platser_final,
+        g.gräns_diff,
+        g.median_diff,
+        s.latitude,
+        s.longitude,
+        g.skola         
+        from school as s
+        join prelim_final_gymnasium as g on s.name = g.skola
+        where antagningsgräns_prelim between {minpreMerit} and {maxpreMerit} 
+        and (antagningsgräns_final between {minfinMerit} and {maxfinMerit} or antagningsgräns_final is null)"""
+
+    if programs is not None:
+        joined_str = "|".join(programs)
+        cte = f"{cte} and studieväg ~* '^({joined_str})' "
+
+    if year is not None:
+        cte = f"{cte} and år = {year}"
+
+    query = f"""with filtered_gymnasium as ({cte})
+    select *, 
+    ST_DistanceSphere(ST_MakePoint({longitude}, {latitude}), ST_MakePoint(longitude, latitude)) / 1000 as distance_in_km
+    from filtered_gymnasium
+    where ST_DistanceSphere(ST_MakePoint({longitude}, {latitude}), ST_MakePoint(longitude, latitude)) / 1000 < {radius}
+    order by {sortby} {sortOrder}
+    limit {pagesize} offset {pagenumber*pagesize};"""
+    print(query)
+    try:
+        connection = __GetdbConn()
+        cursor = connection.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        cursor.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if connection is not None:
+            connection.close()
+
+    return data
+
+
+
 
 
 """print(GetListOfSchoolNames(0, 2))

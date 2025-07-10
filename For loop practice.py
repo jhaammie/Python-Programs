@@ -22,7 +22,7 @@ for i in range(1, num + 1):  #1
 
     print()
 """
-
+"""
 rows = int(input("Enter number of rows: "))
 
 for i in range(1, rows + 1):
@@ -36,8 +36,7 @@ for i in range(1, rows + 1):
             print(" ", end=" ")
 
 
-# j 0 3 4 i 5 1 2
-    print()
+    print()"""
 
 """# 16 Hollow square (rectangle) pattern
 num = int(input("enter number of rows and columns: "))  #5
@@ -241,7 +240,7 @@ product = 1
 for i in range(1, n+1):
     product = product * i
 print(product)
-
+"""
 
 #1 Sum of list of elements
 numbers = [1, 2, 3, 4, 5]
@@ -250,4 +249,4 @@ for i in range(len(numbers)):
     sum = sum+numbers[i]
 
 print(sum)
-"""
+
