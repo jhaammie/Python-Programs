@@ -13,11 +13,16 @@
   <div class="container py-5">
 
     <h1 class="text-center mb-5">Hitta gymnasiet</h1>
+     <label for="search" class="form-label">Search:</label>
+    <input type="text" id="search" name="search">
+    <button onclick="OpenNewPage()" class="btn btn-success" type="button">search</button>
+
 
     <div class="d-flex justify-content-center mb-4">
       <!-- <button onclick="getLocation(getNearestGymnasium)" class="btn btn-primary me-2" type="button">Get Gymnasiums Near Me (top 10)</button>-->
       <button onclick="getLocation(getGymnasiumWithInRadius)" class="btn btn-success" type="button">Få gymnasiet inom
         radie</button>
+
     </div>
       <div class="col-md-6 mb-3">
         <label for="year" class="form-label">År:</label>

@@ -26,6 +26,11 @@
         .catch(error => console.error("Error:", error));
     }
 
+    function OpenNewPage(){
+        window.open("/details.html")
+
+    }
+
     function previouspage(){
         if (currentpage>0){
             currentpage = currentpage-1
