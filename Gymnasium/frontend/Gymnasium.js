@@ -27,8 +27,18 @@
     }
 
     function OpenNewPage(){
-        window.open("/details.html")
+        window.open("./details.html")
 
+    }
+
+    function GETSCHOOLNAMES(){
+    const search = document.getElementById("search").value;
+     fetch(`http://127.0.0.1:5006/gymnasium/search?${search}`,
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' })
+        .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
+        .then(response => console.log(response))
+        .catch(error => console.error("Error:", error));
     }
 
     function previouspage(){

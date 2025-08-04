@@ -98,6 +98,9 @@ def GymnasiumWithinRadius():
         list.append(d)
     return list
 
+@app.route('/gymnasium/search', methods=["GET"])
+def gymnasiumSearch():
+    return "tedyfghkj"
 
 # Get the data for those schools (l.22)
 
