@@ -31,15 +31,27 @@
 
     }
 
-    function GETSCHOOLNAMES(){
+    function GETSCHOOLNAMES() {
     const search = document.getElementById("search").value;
-     fetch(`http://127.0.0.1:5006/gymnasium/search?${search}`,
+    const url = `http://127.0.0.1:5006/gymnasium/search?search_query=${encodeURIComponent(search)}`;
+    result_element = document.getElementById("results")
+    fetch(url, {
         method: "GET",
-        headers: { 'Content-Type': 'application/json' })
-        .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
-        .then(response => console.log(response))
-        .catch(error => console.error("Error:", error));
-    }
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
+    .then(data => {if (data.length === 0) {
+        result_element.innerHTML = "<li>No results found</li>";
+        return;
+      }
+    result_element.innerHTML = ''
+      data.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        result_element.appendChild(li);
+      });})
+    .catch(error => console.error("Error:", error));
+}
 
     function previouspage(){
         if (currentpage>0){

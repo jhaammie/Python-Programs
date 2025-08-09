@@ -142,6 +142,26 @@ def GetGymnasiumWithinRadius(latitude, longitude, radius, pageno, pagesize):
         # print('Database connection closed.')
     return data
 
+def SearchSchoolsByName(name):
+    data = []
+    try:
+        query = f"select name from school where name ilike '%{name}%'"
+        print("query: ", query)
+        connection = __GetdbConn()
+        cursor = connection.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        cursor.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if connection is not None:
+            connection.close()
+        # print('Database connection closed.')
+    return data
+
+
 def GetPaginatedDataForSchools(latitude, longitude, radius, pagenumber, pagesize, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000,
                       programs=None, year=None):
     cte = f"""select

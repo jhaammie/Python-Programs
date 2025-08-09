@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
-from hoohoohee import GetNearestSchools, GetDataForSchools, GetPaginatedDataForSchools
+from hoohoohee import GetNearestSchools, GetDataForSchools, GetPaginatedDataForSchools, SearchSchoolsByName
 
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)
@@ -100,7 +100,9 @@ def GymnasiumWithinRadius():
 
 @app.route('/gymnasium/search', methods=["GET"])
 def gymnasiumSearch():
-    return "tedyfghkj"
+    SearchQuery = request.args.get('search_query')
+    result = SearchSchoolsByName(SearchQuery)
+    return result
 
 # Get the data for those schools (l.22)
 
