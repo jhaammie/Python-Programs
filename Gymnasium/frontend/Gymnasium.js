@@ -26,8 +26,8 @@
         .catch(error => console.error("Error:", error));
     }
 
-    function OpenNewPage(){
-        window.open("./details.html")
+    function OpenNewPage(schoolName){
+        //window.open(`./details.html?=${schoolName}`)
 
     }
 
@@ -55,6 +55,7 @@
             </div>
           </div>
         `;
+        cardDiv.onclick = OpenNewPage(${item});
         result_element.appendChild(cardDiv);
       });})
     .catch(error => console.error("Error:", error));
