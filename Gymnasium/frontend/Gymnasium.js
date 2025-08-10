@@ -41,14 +41,21 @@
     })
     .then(response => response.ok ? response.json() : response.text().then(Promise.reject))
     .then(data => {if (data.length === 0) {
-        result_element.innerHTML = "<li>No results found</li>";
+        result_element.innerHTML = "<div class='col-12'><div class='alert alert-info text-center'>No results found</div></div>";
         return;
       }
     result_element.innerHTML = ''
       data.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        result_element.appendChild(li);
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "col-md-6 col-lg-4";
+        cardDiv.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title text-primary">${item}</h6>
+            </div>
+          </div>
+        `;
+        result_element.appendChild(cardDiv);
       });})
     .catch(error => console.error("Error:", error));
 }
