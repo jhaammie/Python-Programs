@@ -100,9 +100,15 @@ def GymnasiumWithinRadius():
 
 @app.route('/gymnasium/search', methods=["GET"])
 def gymnasiumSearch():
+    lst = []
     SearchQuery = request.args.get('search_query')
+    SearchQuery = SearchQuery.strip()
     result = SearchSchoolsByName(SearchQuery)
-    return result
+    for i in result:
+        d = {"name": i[0],
+             "id": i[1]}
+        lst.append(d)
+    return lst
 
 # Get the data for those schools (l.22)
 

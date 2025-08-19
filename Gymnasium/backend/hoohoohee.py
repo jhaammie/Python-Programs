@@ -145,7 +145,7 @@ def GetGymnasiumWithinRadius(latitude, longitude, radius, pageno, pagesize):
 def SearchSchoolsByName(name):
     data = []
     try:
-        query = f"select name from school where name ilike '%{name}%'"
+        query = f"select name, id from school where name ilike '%{name}%'"
         print("query: ", query)
         connection = __GetdbConn()
         cursor = connection.cursor()

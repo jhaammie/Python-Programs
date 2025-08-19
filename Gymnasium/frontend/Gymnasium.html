@@ -18,7 +18,7 @@
       <div class="col-12">
         <label for="search" class="form-label fw-bold">Sök gymnasieskolor:</label>
         <div class="input-group">
-          <input type="text" id="search" name="search" class="form-control form-control-lg" placeholder="Ange skolnamn...">
+          <input type="text" id="search" name="search" class="form-control form-control-lg" oninput = "debounceGetSchoolNames()" placeholder="Ange skolnamn...">
           <button onclick="GETSCHOOLNAMES()" class="btn btn-success btn-lg" type="button">
             <i class="bi bi-search"></i> Sök
           </button>

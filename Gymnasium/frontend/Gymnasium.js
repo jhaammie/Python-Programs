@@ -26,13 +26,15 @@
         .catch(error => console.error("Error:", error));
     }
 
-    function OpenNewPage(schoolName){
-        window.open(`./details.html?name=${schoolName}`)
+    function OpenNewPage(school){
+        window.open(`./details.html?name=${school.name}&id=${school.id}`)
+        console.log(school)
 
     }
 
     function GETSCHOOLNAMES() {
-    const search = document.getElementById("search").value;
+    let search = document.getElementById("search").value;
+    search = search.trim()
     const url = `http://127.0.0.1:5006/gymnasium/search?search_query=${encodeURIComponent(search)}`;
     result_element = document.getElementById("results")
     fetch(url, {
@@ -44,6 +46,7 @@
         result_element.innerHTML = "<div class='col-12'><div class='alert alert-info text-center'>No results found</div></div>";
         return;
       }
+
     result_element.innerHTML = ''
       data.forEach(item => {
         const cardDiv = document.createElement("div");
@@ -51,7 +54,7 @@
         cardDiv.innerHTML = `
           <div class="card h-100 shadow-sm">
             <div class="card-body">
-              <h6 class="card-title text-primary">${item}</h6>
+              <h6 class="card-title text-primary">${item.name}</h6>
             </div>
           </div>
         `;
@@ -60,7 +63,11 @@
       });})
     .catch(error => console.error("Error:", error));
 }
-
+let timeout;
+function debounceGetSchoolNames() {
+        clearTimeout(timeout);
+        timeout = setTimeout(GETSCHOOLNAMES, 1000);
+}
     function previouspage(){
         if (currentpage>0){
             currentpage = currentpage-1
