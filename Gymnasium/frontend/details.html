@@ -3,23 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script>
-        window.onload = function () {
-      // Get query string parameters
-      console.log(window.location)
-      console.log(window.location.search)
-      const params = new URLSearchParams(window.location.search);
-      // Get 'name' value
-      const name = params.get("name");
-
-      // If name exists, set it as the title
-      if (name) {
-        document.title = name;
-      }
-    }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="details.js"></script>
+    <link  rel="stylesheet" href="details.css" />
 </head>
 <body>
+<h2 id="schoolname">Gymnasiet</h2>
+<h3 id="kommun">Kommun</h3>
+<button id="ViewInMaps">View in google maps</button>
+<div id="scores" />
+<div id="schoolChart"/>
 
 </body>
 </html>

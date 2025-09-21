@@ -161,6 +161,25 @@ def SearchSchoolsByName(name):
         # print('Database connection closed.')
     return data
 
+def GetSchoolDetails(id):
+    data = []
+    try:
+        query = f"select * from school full join prelim_final_gymnasium on school.id = prelim_final_gymnasium.school_id where id = {id}"
+        print("query: ", query)
+        connection = __GetdbConn()
+        cursor = connection.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+        cursor.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if connection is not None:
+            connection.close()
+        # print('Database connection closed.')
+    return data
+
 
 def GetPaginatedDataForSchools(latitude, longitude, radius, pagenumber, pagesize, sortby, sortOrder, minpreMerit=0, minfinMerit=0, maxpreMerit=1000, maxfinMerit=1000,
                       programs=None, year=None):

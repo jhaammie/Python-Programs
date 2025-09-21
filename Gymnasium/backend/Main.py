@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
-from hoohoohee import GetNearestSchools, GetDataForSchools, GetPaginatedDataForSchools, SearchSchoolsByName
+from hoohoohee import GetNearestSchools, GetDataForSchools, GetPaginatedDataForSchools, SearchSchoolsByName, \
+    GetSchoolDetails
 
 app = Flask(__name__)  # Creates an instance of app
 CORS(app)
@@ -114,6 +115,43 @@ def gymnasiumSearch():
 
 # Write a join in the getnearestschool function to get you the data which has not just the school names but the other data too.
 
+
+@app.route('/gymnasium/details', methods=["POST"])
+def GetGymnasiumDetails():
+    content = request.json
+    id = content["id"]
+    if id.isnumeric():
+        data = GetSchoolDetails(id)
+        response = {}
+        response["id"] = data[0][0]
+        response["name"] = data[0][1]
+        response["latitude"] = data[0][2]
+        response["longitude"] = data[0][3]
+        response["kommun"] = data[0][6]
+        response["score"] = []
+        for i in data:
+            score = {}
+            score["year"] = i[5]
+            score["organisationsform"] = i[8]
+            score["studievägskod"] = i[9]
+            score["Studievag"] = i[10]
+            score["Antagningsgrans_prelim"] = i[11]
+            score["Antagningsgrans_final"] = i[12]
+            score["Median_prelim"] = i[13]
+            score["Median_final"] = i[14]
+            score["Antal_platser_prelim"] = i[15]
+            score["Antal_platser_final"] = i[16]
+            score["Antagna_prelim"] = i[17]
+            score["Antagna_final"] = i[18]
+            score["Reserver_prelim"] = i[19]
+            score["Reserver_final"] = i[20]
+            score["Lediga_platser_prelim"] = i[21]
+            score["Lediga_platser_final"] = i[22]
+
+            response["score"].append(score)
+        print(data[0])
+
+        return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=5006)
