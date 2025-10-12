@@ -84,6 +84,7 @@ function debounceGetSchoolNames() {
         document.getElementById("location").innerHTML = "Enter a valid radius value";
         return;
       }
+      document.getElementById("location").innerHTML = "";
       const sortBy = document.getElementById("sortBy").value;
       const programOptions = document.getElementById("program").options;
       console.log(programOptions)
