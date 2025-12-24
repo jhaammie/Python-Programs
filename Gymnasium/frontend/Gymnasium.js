@@ -89,6 +89,7 @@ function debounceGetSchoolNames() {
       const programOptions = document.getElementById("program").options;
       console.log(programOptions)
       const selectedPrograms = [];
+      // For every program in program options
       for (const program of programOptions) {
         if (program.selected) {
           selectedPrograms.push(program.value);

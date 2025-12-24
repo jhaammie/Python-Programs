@@ -22,7 +22,7 @@ function ShowSchoolDetails(SchoolDetails) {
   document.getElementById("kommun").innerHTML = SchoolDetails.kommun
   document.getElementById("ViewInMaps").onclick = () => window.open(`https://www.google.com/maps/search/?api=1&query=${SchoolDetails.latitude},${SchoolDetails.longitude}`)
   labels = SchoolDetails.score.map(item => item.year)
-  const years = new Set(Array.from(labels));
+  const years = Array.from(new Set(labels));
   console.log(SchoolDetails.score[0])
   // groupedData = { if (!grouped[d.studievagscod]) grouped[d.studievagscod] = [];
   // grouped[d.studievagscod].push({ x: d.year, y: d.score });}
