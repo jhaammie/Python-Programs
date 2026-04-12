@@ -23,7 +23,7 @@ for i in range(0, len(lst)):
     a = sum(lst) / len(lst)
 
 print(a)"""
-
+"""
 def prema(num):
     num = abs(num)
     num = int(num)
@@ -36,7 +36,7 @@ def prema(num):
     else:
         print(num, "is a prime")
     primefinder = 1
-    return primefinder
+    return primefinder"""
 
 
 num1 = int(input("Number 1: "))

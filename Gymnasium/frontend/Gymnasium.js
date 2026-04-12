@@ -3,6 +3,8 @@
    function getLocation(callback) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
+          // this is a stupidly formatted callback function which Nisha
+          // named anonymous function with the logic that it has no name
           (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;

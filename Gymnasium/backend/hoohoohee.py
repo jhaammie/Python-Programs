@@ -214,7 +214,10 @@ def GetPaginatedDataForSchools(latitude, longitude, radius, pagenumber, pagesize
 
     if programs is not None:
         joined_str = "|".join(programs)
+        print(programs)
         cte = f"{cte} and studieväg ~* '^({joined_str})' "
+        print(cte)
+        print(joined_str)
 
     if year is not None:
         cte = f"{cte} and år = {year}"
