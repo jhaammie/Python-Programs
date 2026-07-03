@@ -1,4 +1,5 @@
 venv
 .vscode/launch.json
 Gymnasium/.DS_Store
-.DS_Store
+**/.DS_Store
+**/.env
