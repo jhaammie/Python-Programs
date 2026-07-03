@@ -36,7 +36,7 @@ class TMDBclient:
         # Adding the rating to a specific movie/tv series
         r = tmdb_client.GetGuestSessionID()  # Call the method to get the guest session ID
         d = tmdb_client.GetMovieDetailsBasedOnName()
-        u = f"https://api.themoviedb.org/3/movie/{d}/rating?guest_session_id={r}"
+      <  u = f"https://api.themoviedb.org/3/movie/{d}/rating?guest_session_id={r}"
         print(u)
 
         # The payload is basically the number rating I give it
@@ -51,7 +51,7 @@ class TMDBclient:
         req = requests.post(u, data=payload, headers=headers)
 
         print(req.text)
-
+>
         # Getting movie ID based on name
     def GetMovieDetailsBasedOnName(self):
         name = input("Please enter the name of the movie: ")

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gymnasium</title>
+
+<style>
+h1 {text-align: center;}
+body {
+  background-color: navy;
+  color: white;
+}
+button {
+background-color: white;
+color: black;
+height: 20px;
+
+}
+
+.myDiv {
+  margin: 10px;
+  padding: 10px;
+  border: 10px outset white;
+  border-radius: 25px;
+  width: 250px !important;
+  color: white;
+  }
+
+.containerdiv {
+    display: flex;
+    flex-wrap: wrap;
+    }
+</style>
+    <script src="details.js"></script>
+</head>
+<body>
+<h2 id="schoolname">Gymnasiet</h2>
+<label for="feedback">Give feedback:</label>
+    <textarea id="feedback" rows="10" cols="20">
+        Feedback
+    </textarea>
+          <button type="button" onclick="submitFeedback()">submit</button>
+
+</body>
+</html>
+

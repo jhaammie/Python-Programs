@@ -45,7 +45,8 @@ let search = document.getElementById("search").value;
 
 
 function OpenPage(SchoolName) {
-    alert(SchoolName)
+    window.open(`./details.html?name=${SchoolName}`)
+        console.log(SchoolName)
 }
 
 

@@ -91,6 +91,13 @@ def GymnasiumWithinRadius():
         list.append(d)
     return list
 
+@app.route('/submit-feedback', methods=["POST"])
+def submitFeedback():
+    content = request.json
+    print(content)
+    schoolname = content["schoolname"]
+    feedback = content["feedback"]
+    return feedback
 
 
 
