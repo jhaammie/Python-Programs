@@ -70,3 +70,22 @@ def updating(id, check):
         print(error)
         connection.close()
         return -1
+
+def delete(id):
+    global connection
+
+    try:
+        query = f"DELETE FROM public.\"TaskManager\" WHERE id={id};"
+        connection = __GetdbConn()
+        cursor = connection.cursor()
+        cursor.execute(query)
+        connection.commit()
+        print(f"Successfully deleted {id} row(s).")
+
+        cursor.close()
+        connection.close()
+        return id
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        connection.close()
+        return -1

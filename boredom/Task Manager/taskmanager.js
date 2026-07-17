@@ -33,7 +33,7 @@ function reusable(){
     if (data[item]["Is_Completed"]){
     checked = "checked"
     }
-    displaylist += `<li><input onChange=checkboxclicked(${id}) type="checkbox" ${checked}/>${data[item]["Task"]}</li>`
+    displaylist += `<li><input onChange=checkboxclicked(${id}) type="checkbox" ${checked}/>${data[item]["Task"]}&nbsp;&nbsp;<button onclick="deleting(${id})">Delete</button></li>`
     }
     document.getElementById('coffee').innerHTML = displaylist;
 });
@@ -57,4 +57,19 @@ function checkboxclicked(id){
     })
 
 
+}
+
+function deleting(id){
+    console.log(id)
+   const url = `http://127.0.0.1:5006/tasks/${id}`
+ fetch(url, {
+        method: "DELETE",
+        headers: { 'Content-Type': 'application/json' }
+    })
+
+.then(response => response.ok ? response.json() : response.text().then(Promise.reject))
+    .then(data => {
+    console.log(data)
+    reusable()
+});
 }

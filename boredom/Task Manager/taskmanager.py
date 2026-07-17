@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
-from taskmanagerdb import addingtask, gettasks, updating
+from taskmanagerdb import addingtask, gettasks, updating, delete
 
 app = Flask(__name__)  # Creates an instance of app
 CORS(app, origins=[
@@ -36,17 +36,22 @@ def reusable():
     print(lst)
     return lst
 
-@app.post("/tasks/{id}")
-def check(id:int):
-    print(id)
+@app.route('/tasks/<int:id>', methods=['PUT'])
+def check(id):
+    data = request.get_json()
+
+    checked = data.get('checked')
+
+    id = updating(id, checked)
+
+    return str(id)
+
+@app.route('/tasks/<int:id>', methods=['DELETE'])
+def deleting(id):
+    id = delete(id)
 
     return str(id)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=5006)
 
-    """  data = request.get_json()
-
-      checked = data.get('checked')
-
-      id = updating(id, checked)"""
