@@ -1,3 +1,4 @@
+
 function askai(){
 
 const userInput = document.getElementById('askai').value;

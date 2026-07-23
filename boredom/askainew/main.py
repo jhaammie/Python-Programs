@@ -6,6 +6,7 @@ from mistralai.client import Mistral
 
 app = Flask(__name__)
 
+
 CORS(app)
 
 @app.route("/question", methods=["POST"])
