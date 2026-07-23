@@ -8,7 +8,6 @@ app = Flask(__name__)
 
 CORS(app)
 
-
 @app.route("/question", methods=["POST"])
 def apicall():
     data = request.get_json()
