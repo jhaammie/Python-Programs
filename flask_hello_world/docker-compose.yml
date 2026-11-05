@@ -6,7 +6,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5005:5005"
+      - "5006:5005"
     volumes:
       - ./backend:/app
     restart: always
@@ -14,7 +14,7 @@ services:
   nginx-frontend:
     image: nginx:latest
     ports:
-      - "8005:80"
+      - "8006:80"
     volumes:
       - ./static:/usr/share/nginx/html
     depends_on:
